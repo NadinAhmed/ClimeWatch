@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Clime Watch</string>
+    <string name="splash_tagline">Track severe weather alerts and forecasts anywhere.</string>
 </resources>
