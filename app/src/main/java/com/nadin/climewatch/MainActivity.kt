@@ -4,14 +4,43 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.bottombar.AnimatedBottomBar
+import com.example.bottombar.components.BottomBarItem
+import com.example.bottombar.model.IndicatorStyle
+import com.example.bottombar.model.VisibleItem
+import com.nadin.climewatch.presentation.features.SplashScreen
+import com.nadin.climewatch.presentation.features.alert.AlertScreen
+import com.nadin.climewatch.presentation.features.favourite.FavScreen
+import com.nadin.climewatch.presentation.features.home.HomeScreen
+import com.nadin.climewatch.presentation.features.settings.SettingsScreen
 import com.nadin.climewatch.presentation.ui.theme.ClimeWatchTheme
+import com.nadin.climewatch.presentation.utils.BottomNavItem
+import com.nadin.climewatch.presentation.utils.NavigationRoutes
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +48,98 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ClimeWatchTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MainScreen()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun MainScreen() {
+
+    val navController = rememberNavController()
+
+    val items = listOf(
+        BottomNavItem("Home", NavigationRoutes.Home.route, Icons.Default.Home),
+        BottomNavItem("Favourite", NavigationRoutes.Favourite.route, Icons.Default.Favorite),
+        BottomNavItem("Alerts", NavigationRoutes.Alerts.route, Icons.Default.Timer),
+        BottomNavItem("Settings", NavigationRoutes.Settings.route, Icons.Default.Settings)
     )
+
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val shouldShowBottomBar = currentRoute != null && currentRoute != NavigationRoutes.Splash.route
+
+    Scaffold(
+        containerColor = Color.Transparent,
+        bottomBar = {
+            if (shouldShowBottomBar) {
+                Box(modifier = Modifier.navigationBarsPadding()) {
+                    AnimatedBottomBar(
+                        selectedItem = selectedIndex,
+                        itemSize = items.size,
+                        containerColor = Color.White.copy(alpha = 0.4f),
+                        indicatorStyle = IndicatorStyle.DOT,
+                        containerShape = RoundedCornerShape(50.dp),
+                    ) {
+                        items.forEachIndexed { index, screen ->
+                            BottomBarItem(
+                                selected = currentRoute == screen.route,
+                                onClick = {
+                                    selectedIndex = index
+
+                                    navController.navigate(screen.route) {
+                                        popUpTo(NavigationRoutes.Home.route) {
+                                            saveState = false
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                                imageVector = screen.icon,
+                                label = screen.name,
+                                visibleItem = VisibleItem.BOTH,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    ) { padding ->
+        NavHost(
+            navController = navController,
+            startDestination = NavigationRoutes.Splash.route,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .consumeWindowInsets(padding)
+        ) {
+            composable(NavigationRoutes.Splash.route) {
+                SplashScreen(onTimeout = {
+                    navController.navigate(
+                        NavigationRoutes.Home.route
+                    ) {
+                        popUpTo(NavigationRoutes.Splash.route) {
+                            inclusive = true
+                        }
+                    }
+                })
+            }
+            composable(NavigationRoutes.Home.route) { HomeScreen() }
+            composable(NavigationRoutes.Favourite.route) { FavScreen() }
+            composable(NavigationRoutes.Alerts.route) { AlertScreen() }
+            composable(NavigationRoutes.Settings.route) { SettingsScreen() }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ClimeWatchTheme {
-        Greeting("Android")
+        MainScreen()
     }
 }

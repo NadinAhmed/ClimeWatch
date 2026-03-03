@@ -10,5 +10,12 @@ object AppGradient {
             PrimaryLightColor
         )
     )
+
+    val labelLinearGradient = Brush.verticalGradient(
+        colors = listOf(
+            LabelLightColor,
+            LabelDarkColor
+        )
+    )
 }
 
