@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -22,6 +23,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,13 +80,19 @@ fun MainScreen() {
         containerColor = Color.Transparent,
         bottomBar = {
             if (shouldShowBottomBar) {
-                Box(modifier = Modifier.navigationBarsPadding()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
+                ) {
                     AnimatedBottomBar(
                         selectedItem = selectedIndex,
                         itemSize = items.size,
                         containerColor = Color.White.copy(alpha = 0.4f),
                         indicatorStyle = IndicatorStyle.DOT,
                         containerShape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(24.dp)),
                     ) {
                         items.forEachIndexed { index, screen ->
                             BottomBarItem(
