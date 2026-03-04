@@ -79,6 +79,9 @@ dependencies {
     //Work Manager
     implementation(libs.androidx.work.runtime.ktx)
 
+    //Location
+    implementation(libs.play.services.location)
+
     //Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)

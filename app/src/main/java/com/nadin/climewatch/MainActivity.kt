@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -61,10 +63,26 @@ fun MainScreen() {
     val navController = rememberNavController()
 
     val items = listOf(
-        BottomNavItem("Home", NavigationRoutes.Home.route, Icons.Default.Home),
-        BottomNavItem("Favourite", NavigationRoutes.Favourite.route, Icons.Default.Favorite),
-        BottomNavItem("Alerts", NavigationRoutes.Alerts.route, Icons.Default.Timer),
-        BottomNavItem("Settings", NavigationRoutes.Settings.route, Icons.Default.Settings)
+        BottomNavItem(
+            stringResource(R.string.home),
+            NavigationRoutes.Home.route,
+            Icons.Default.Home
+        ),
+        BottomNavItem(
+            stringResource(R.string.favourite),
+            NavigationRoutes.Favourite.route,
+            Icons.Default.Favorite
+        ),
+        BottomNavItem(
+            stringResource(R.string.alerts),
+            NavigationRoutes.Alerts.route,
+            Icons.Default.Timer
+        ),
+        BottomNavItem(
+            stringResource(R.string.settings),
+            NavigationRoutes.Settings.route,
+            Icons.Default.Settings
+        )
     )
 
     var selectedIndex by remember { mutableIntStateOf(0) }
