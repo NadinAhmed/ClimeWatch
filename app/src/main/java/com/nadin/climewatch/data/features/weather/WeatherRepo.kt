@@ -5,9 +5,8 @@ import com.nadin.climewatch.data.features.weather.dto.toModel
 import com.nadin.climewatch.data.features.weather.model.Weather
 import java.io.IOException
 
-class WeatherRepository(
-    private val remoteDataSource: WeatherRemoteDatasource
-) {
+class WeatherRepository() {
+    private val remoteDataSource: WeatherRemoteDatasource = WeatherRemoteDatasource()
     suspend fun getCurrentWeather(
         lat: Double,
         lon: Double
