@@ -1,10 +1,15 @@
 import com.android.tools.r8.internal.im
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     kotlin("plugin.serialization") version "2.3.10"
+}
+
+val localProperties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
 }
 
 android {
@@ -21,14 +26,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val apiKey = project.findProperty("WEATHER_API_KEY") as String?
-
-        buildConfigField(
-            "String",
-            "WEATHER_API_KEY",
-            "\"${apiKey}\""
-        )
     }
 
     buildTypes {
@@ -39,6 +36,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+    defaultConfig {
+        buildConfigField(
+            "String",
+            "WEATHER_API_KEY",
+            "\"${localProperties["WEATHER_API_KEY"]}\""
+        )
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

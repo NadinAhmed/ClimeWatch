@@ -1,41 +1,50 @@
 package com.nadin.climewatch.presentation.features.home
 
-import android.content.Context
-import android.content.Intent
-import android.location.LocationManager
-import android.provider.Settings
-import android.widget.Toast
+import LocationProvider
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.location.LocationServices
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.presentation.utils.Location
 import com.nadin.climewatch.presentation.utils.Location.enableLocationServices
 import com.nadin.climewatch.presentation.utils.Location.isLocEnabled
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen() {
 
-    val context = LocalContext.current
     val repository = WeatherRepository()
-    val viewModel : HomeViewModel = viewModel(
+    val viewModel: HomeViewModel = viewModel(
         factory = FavViewModelFactory(repository)
     )
     val state = viewModel.uiState.collectAsState()
+
+/*
+    val locationClient = remember {
+        LocationProvider(
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(
+                context
+            )
+        )
+    }
+
+    val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 
     val permissionLauncher =
         rememberLauncherForActivityResult(
@@ -47,7 +56,10 @@ fun HomeScreen() {
 
             if (granted) {
                 if (isLocEnabled(context)) {
-                    // fetch weather
+                    lifecycleScope.launch {
+                        val location = locationClient.getCurrentLocation()
+                        viewModel.getCurrentWeather()
+                    }
                 } else {
                     enableLocationServices(context)
                 }
@@ -57,9 +69,10 @@ fun HomeScreen() {
     LaunchedEffect(Unit) {
         if (Location.checkLocationPermission(context)) {
             if (isLocEnabled(context)) {
-                // Fetch weather data based on location from view model and update UI
+                val location = locationClient.getCurrentLocation()
+                viewModel.getCurrentWeather()
             } else {
-               enableLocationServices(context)
+                enableLocationServices(context)
             }
         } else {
             permissionLauncher.launch(
@@ -70,6 +83,7 @@ fun HomeScreen() {
             )
         }
     }
+*/
 
     Column(
         modifier = Modifier.fillMaxSize(),

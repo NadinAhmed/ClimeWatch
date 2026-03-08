@@ -3,6 +3,7 @@ package com.nadin.climewatch.presentation.features.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,12 +15,16 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState
 
-    fun getCurrentWeather(lat: Double, lon: Double) {
+    init {
+        getCurrentWeather()
+    }
+
+    fun getCurrentWeather() {
 
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
 
-            val result = repository.getCurrentWeather(lat, lon)
+            val result = repository.getCurrentWeather(40.7128, -74.0060)
             result.onSuccess { weather ->
 
                 _uiState.value = HomeUiState.Success(weather)
@@ -27,7 +32,7 @@ class HomeViewModel(
             }.onFailure {
 
                 _uiState.value = HomeUiState.Error(
-                    it.message ?: "Unknown error"
+                    it.message ?: R.string.unknown_error_message.toString()
                 )
             }
         }

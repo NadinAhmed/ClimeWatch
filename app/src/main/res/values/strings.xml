@@ -6,4 +6,7 @@
     <string name="alerts">Alerts</string>
     <string name="settings">Settings</string>
     <string name="turn_on_location">Turn on Location</string>
+    <string name="server_error_message">Can\'t connect to Server.\n Please try again.</string>
+    <string name="network_error_message">No internet connection.\n Please try again later.</string>
+    <string name="unknown_error_message">Unknown Error.</string>
 </resources>

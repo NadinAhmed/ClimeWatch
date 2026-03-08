@@ -1,5 +1,6 @@
 package com.nadin.climewatch.data.features.weather
 
+import android.util.Log
 import com.nadin.climewatch.data.features.weather.datasource.remote.WeatherRemoteDatasource
 import com.nadin.climewatch.data.features.weather.dto.toModel
 import com.nadin.climewatch.data.features.weather.model.Weather
@@ -16,9 +17,7 @@ class WeatherRepository() {
             val model = dto.toModel()
             Result.success(model)
 
-        } catch (e: IOException) {
-            Result.failure(Exception("No internet connection"))
-        } catch (e: Exception) {
+        }catch (e: Exception) {
             Result.failure(e)
         }
     }
