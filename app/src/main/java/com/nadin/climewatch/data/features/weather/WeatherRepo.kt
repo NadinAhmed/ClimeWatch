@@ -1,10 +1,15 @@
 package com.nadin.climewatch.data.features.weather
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.nadin.climewatch.data.features.weather.datasource.remote.WeatherRemoteDatasource
+import com.nadin.climewatch.data.features.weather.dto.toForecast
 import com.nadin.climewatch.data.features.weather.dto.toModel
+import com.nadin.climewatch.data.features.weather.model.Forecast
 import com.nadin.climewatch.data.features.weather.model.Weather
-import java.io.IOException
+import com.nadin.climewatch.presentation.utils.ResultState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class WeatherRepository() {
     private val remoteDataSource: WeatherRemoteDatasource = WeatherRemoteDatasource()
@@ -17,8 +22,23 @@ class WeatherRepository() {
             val model = dto.toModel()
             Result.success(model)
 
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getForecast(
+        lat: Double,
+        lon: Double
+    ): Flow<ResultState<Forecast>> = flow {
+
+        emit(ResultState.Loading)
+        try {
+            val response = remoteDataSource.getForecast(lat, lon)
+            emit(ResultState.Success(response.toForecast()))
+        } catch (e: Exception) {
+            emit(ResultState.Error(e.message ?: "Unknown error"))
         }
     }
 }

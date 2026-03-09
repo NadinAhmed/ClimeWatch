@@ -27,8 +27,7 @@ fun CurrentWeatherDto.toModel(): Weather {
         pressure = mainInfo.pressure,
         clouds = clouds.all,
         description = weather.firstOrNull()?.description ?: "",
-        //TODO("Map icon code to drawable resource")
-        icon = R.drawable.logo,
+        icon = weather.firstOrNull()?.icon ?: "",
         city = city,
         country = sys.country
     )

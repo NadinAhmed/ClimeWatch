@@ -1,5 +1,7 @@
 package com.nadin.climewatch.presentation.features.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,10 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -35,19 +35,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
+import com.nadin.climewatch.data.features.weather.model.Forecast
 import com.nadin.climewatch.data.features.weather.model.Weather
 import com.nadin.climewatch.presentation.features.home.components.ProprietariesItem
 import com.nadin.climewatch.presentation.features.home.components.TodayForecastItem
 import com.nadin.climewatch.presentation.features.home.components.WeeklyForecastItem
-import com.nadin.climewatch.presentation.ui.theme.AppGradient
-import com.nadin.climewatch.presentation.ui.theme.IconBackgroundColor
 import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
-import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
+import com.nadin.climewatch.presentation.utils.IconsMapper.getWeatherIcon
 import com.nadin.climewatch.presentation.utils.components.ErrorScreen
 import com.nadin.climewatch.presentation.utils.components.LoadingScreen
 import com.nadin.climewatch.presentation.utils.components.Spacers
-import com.nadin.climewatch.presentation.utils.UiState
+import com.nadin.climewatch.presentation.utils.ResultState
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen() {
 
@@ -55,7 +55,8 @@ fun HomeScreen() {
     val viewModel: HomeViewModel = viewModel(
         factory = FavViewModelFactory(repository)
     )
-    val state = viewModel.uiState.collectAsState()
+    val weatherState = viewModel.weatherState.collectAsState()
+    val forecastState = viewModel.forecastState.collectAsState()
 
     /*
         val locationClient = remember {
@@ -106,20 +107,44 @@ fun HomeScreen() {
             }
         }
     */
-    HomeContent(state.value)
+    HomeContent(weatherState.value, forecastState.value)
 }
 
 @Composable
-fun HomeContent(state: UiState<Weather>, modifier: Modifier = Modifier) {
-    when (state) {
-        is UiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is UiState.Error -> ErrorScreen(state.message, modifier = modifier.fillMaxSize())
-        is UiState.Success<Weather> -> HomeSuccessContent(weather = state.data, modifier = modifier)
+fun HomeContent(
+    weatherState: ResultState<Weather>,
+    forecastState: ResultState<Forecast>,
+    modifier: Modifier = Modifier
+) {
+    when {
+        weatherState is ResultState.Loading || forecastState is ResultState.Loading -> {
+            LoadingScreen(modifier = modifier.fillMaxSize())
+        }
+
+        weatherState is ResultState.Error -> {
+            ErrorScreen(weatherState.message, modifier = modifier.fillMaxSize())
+        }
+
+        forecastState is ResultState.Error -> {
+            ErrorScreen(forecastState.message, modifier = modifier.fillMaxSize())
+        }
+
+        weatherState is ResultState.Success && forecastState is ResultState.Success -> {
+            HomeSuccessContent(
+                weather = weatherState.data,
+                forecast = forecastState.data,
+                modifier = modifier
+            )
+        }
     }
 }
 
 @Composable
-private fun HomeSuccessContent(weather: Weather, modifier: Modifier = Modifier) {
+private fun HomeSuccessContent(
+    weather: Weather,
+    forecast: Forecast,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -164,13 +189,13 @@ private fun HomeSuccessContent(weather: Weather, modifier: Modifier = Modifier) 
             )
             Spacers.VerticalSpacer(18.dp)
             Image(
-                painter = painterResource(id = R.drawable.clear_n),
+                painter = painterResource(id = getWeatherIcon(weather.icon)),
                 contentDescription = "Weather Image",
                 modifier = Modifier.size(120.dp)
             )
             Spacers.VerticalSpacer(28.dp)
             Text(
-                "${weather.temperature}°C",
+                "${weather.temperature} °",
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -229,11 +254,12 @@ private fun HomeSuccessContent(weather: Weather, modifier: Modifier = Modifier) 
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(10) {
+                items(forecast.hourly.size) { index ->
+                    val hourly = forecast.hourly[index]
                     TodayForecastItem(
-                        hour = "12 PM",
-                        temperature = "28°C",
-                        weatherIconRes = R.drawable.clear_n
+                        hour = hourly.time,
+                        temperature = hourly.temperature,
+                        weatherIconRes = getWeatherIcon(hourly.icon)
                     )
                 }
             }
@@ -245,36 +271,35 @@ private fun HomeSuccessContent(weather: Weather, modifier: Modifier = Modifier) 
             )
             Spacers.VerticalSpacer(12.dp)
         }
-        items(count = 10) { index ->
+        items(forecast.weekly.size) { index ->
+            val daily = forecast.weekly[index]
             WeeklyForecastItem(
-                day = "Monday",
-                weatherDescription = "Clear sky",
-                temperature = "28°C",
-                weatherIconRes = R.drawable.clear_n
+                day = daily.day,
+                weatherDescription = daily.description,
+                temperature = daily.temperature,
+                weatherIconRes = getWeatherIcon(daily.icon)
             )
-            if (index < 9) {
-                Spacers.VerticalSpacer(8.dp)
-            }
+            Spacers.VerticalSpacer(8.dp)
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF352163)
-@Composable
-private fun HomePrev() {
-    HomeContent(
-        UiState.Success(
-            Weather(
-                city = "Cairo",
-                country = "Egypt",
-                temperature = 30.0,
-                humidity = 20,
-                windSpeed = 90.0,
-                pressure = 1000,
-                clouds = 0,
-                description = "Clear sky",
-                icon = R.drawable.logo
-            )
-        ),
-    )
-}
+//@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF352163)
+//@Composable
+//private fun HomePrev() {
+//    HomeContent(
+//        ResultState.Success(
+//            Weather(
+//                city = "Cairo",
+//                country = "Egypt",
+//                temperature = 30.0,
+//                humidity = 20,
+//                windSpeed = 90.0,
+//                pressure = 1000,
+//                clouds = 0,
+//                description = "Clear sky",
+//                icon = R.drawable.logo
+//            )
+//        ),
+//    )
+//}

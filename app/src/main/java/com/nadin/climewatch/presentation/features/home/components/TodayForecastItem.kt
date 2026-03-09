@@ -26,10 +26,10 @@ import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
 import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 
 @Composable
-fun TodayForecastItem(hour: String, temperature: String, weatherIconRes: Int) {
+fun TodayForecastItem(hour: String, temperature: Double, weatherIconRes: Int) {
     Box(
         modifier = Modifier
-            .width(70.dp)
+            .width(80.dp)
             .background(
                 Color.White.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(16.dp)
@@ -58,7 +58,7 @@ fun TodayForecastItem(hour: String, temperature: String, weatherIconRes: Int) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                temperature,
+                "$temperature °",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

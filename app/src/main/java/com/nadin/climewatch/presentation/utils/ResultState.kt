@@ -1,14 +1,14 @@
 package com.nadin.climewatch.presentation.utils
 
-sealed class UiState<out T> {
+sealed class ResultState<out T> {
 
-    object Loading : UiState<Nothing>()
+    object Loading : ResultState<Nothing>()
 
     data class Success<T>(
         val data: T
-    ) : UiState<T>()
+    ) : ResultState<T>()
 
     data class Error(
         val message: String
-    ) : UiState<Nothing>()
+    ) : ResultState<Nothing>()
 }
