@@ -1,6 +1,7 @@
 package com.nadin.climewatch.data.features.weather.dto
 
 import com.google.gson.annotations.SerializedName
+import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.model.Weather
 
 data class CurrentWeatherDto(
@@ -26,7 +27,8 @@ fun CurrentWeatherDto.toModel(): Weather {
         pressure = mainInfo.pressure,
         clouds = clouds.all,
         description = weather.firstOrNull()?.description ?: "",
-        icon = weather.firstOrNull()?.icon ?: "",
+        //TODO("Map icon code to drawable resource")
+        icon = R.drawable.logo,
         city = city,
         country = sys.country
     )

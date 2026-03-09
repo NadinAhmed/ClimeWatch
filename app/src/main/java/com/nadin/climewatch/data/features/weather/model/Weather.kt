@@ -7,7 +7,7 @@ data class Weather(
     val pressure: Int,
     val clouds: Int,
     val description: String,
-    val icon: String,
+    val icon: Int,
     val city: String,
     val country: String,
 )

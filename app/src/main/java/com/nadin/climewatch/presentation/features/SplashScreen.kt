@@ -92,7 +92,7 @@ fun SplashScreen(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             text = stringResource(R.string.splash_tagline),
             color = Color.White.copy(alpha = 0.9f),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxWidth()
         )
     }

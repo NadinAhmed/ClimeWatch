@@ -9,4 +9,9 @@
     <string name="server_error_message">Can\'t connect to Server.\n Please try again.</string>
     <string name="network_error_message">No internet connection.\n Please try again later.</string>
     <string name="unknown_error_message">Unknown Error.</string>
+    <string name="pressure">Pressure</string>
+    <string name="wind_speed">Wind</string>
+    <string name="humidity">Humidity</string>
+    <string name="today">Today</string>
+    <string name="weekly_forecast">Weekly Forecast</string>
 </resources>

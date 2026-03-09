@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -41,7 +43,12 @@ import com.nadin.climewatch.presentation.features.alert.AlertScreen
 import com.nadin.climewatch.presentation.features.favourite.FavScreen
 import com.nadin.climewatch.presentation.features.home.HomeScreen
 import com.nadin.climewatch.presentation.features.settings.SettingsScreen
+import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.ClimeWatchTheme
+import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
+import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 import com.nadin.climewatch.presentation.utils.BottomNavItem
 import com.nadin.climewatch.presentation.utils.NavigationRoutes
 
@@ -100,12 +107,23 @@ fun MainScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(
+                            Color.White.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        .border(
+                            width = 2.dp,
+                            color = PrimaryDarkColor,
+                            shape = RoundedCornerShape(24.dp)
+                        )
                 ) {
                     AnimatedBottomBar(
                         selectedItem = selectedIndex,
                         itemSize = items.size,
-                        containerColor = Color.White.copy(alpha = 0.4f),
+                        containerColor = Color.Transparent,
                         indicatorStyle = IndicatorStyle.DOT,
+                        indicatorColor = PrimaryDarkColor,
                         containerShape = RoundedCornerShape(50.dp),
                         modifier = Modifier
                             .clip(RoundedCornerShape(24.dp)),
@@ -127,6 +145,8 @@ fun MainScreen() {
                                 imageVector = screen.icon,
                                 label = screen.name,
                                 visibleItem = VisibleItem.BOTH,
+                                iconColor = PrimaryDarkColor,
+                                textColor = PrimaryDarkColor,
                             )
                         }
                     }
