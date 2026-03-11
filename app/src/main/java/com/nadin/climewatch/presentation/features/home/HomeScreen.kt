@@ -75,7 +75,7 @@ import com.nadin.climewatch.presentation.utils.components.Spacers
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(cityName: String? = null) {
+fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = null) {
 
     val context = LocalContext.current
     val viewModel: HomeViewModel = viewModel(
@@ -111,6 +111,8 @@ fun HomeScreen(cityName: String? = null) {
             if (event == Lifecycle.Event.ON_RESUME) {
                 if (cityName != null) {
                     viewModel.loadWeatherForSpecificLocation(cityName)
+                } else if (lat != null && lon != null) {
+                    viewModel.loadWeatherForSpecificLocation(lat, lon)
                 } else {
                     if (Location.checkLocationPermission(context)) {
                         if (isLocEnabled(context)) {
@@ -147,12 +149,15 @@ fun HomeContent(
         weatherState is ResultState.Loading || forecastState is ResultState.Loading -> {
             LoadingScreen(modifier = modifier.fillMaxSize())
         }
+
         weatherState is ResultState.Error -> {
             ErrorScreen(weatherState.message, modifier = modifier.fillMaxSize())
         }
+
         forecastState is ResultState.Error -> {
             ErrorScreen(forecastState.message, modifier = modifier.fillMaxSize())
         }
+
         weatherState is ResultState.Success && forecastState is ResultState.Success -> {
             HomeSuccessContent(
                 weather = weatherState.data,
