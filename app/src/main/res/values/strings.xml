@@ -14,4 +14,8 @@
     <string name="humidity">Humidity</string>
     <string name="today">Today</string>
     <string name="weekly_forecast">Weekly Forecast</string>
+    <string name="location_permission_title">Allow Location Access</string>
+    <string name="location_permission_message">Clime Watch needs your location to show the correct forecast. Please grant access.</string>
+    <string name="grant_location_access">Grant Access</string>
+    <string name="open_settings">Open Settings</string>
 </resources>

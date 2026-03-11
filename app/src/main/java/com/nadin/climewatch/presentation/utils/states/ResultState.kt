@@ -1,4 +1,4 @@
-package com.nadin.climewatch.presentation.utils
+package com.nadin.climewatch.presentation.utils.states
 
 sealed class ResultState<out T> {
 

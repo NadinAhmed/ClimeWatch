@@ -1,15 +1,26 @@
 package com.nadin.climewatch.presentation.features.home
 
+import android.Manifest
+import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -18,20 +29,32 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
@@ -42,72 +65,76 @@ import com.nadin.climewatch.presentation.features.home.components.TodayForecastI
 import com.nadin.climewatch.presentation.features.home.components.WeeklyForecastItem
 import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
 import com.nadin.climewatch.presentation.utils.IconsMapper.getWeatherIcon
+import com.nadin.climewatch.presentation.utils.Location
+import com.nadin.climewatch.presentation.utils.Location.enableLocationServices
+import com.nadin.climewatch.presentation.utils.Location.isLocEnabled
+import com.nadin.climewatch.presentation.utils.states.ResultState
 import com.nadin.climewatch.presentation.utils.components.ErrorScreen
 import com.nadin.climewatch.presentation.utils.components.LoadingScreen
 import com.nadin.climewatch.presentation.utils.components.Spacers
-import com.nadin.climewatch.presentation.utils.ResultState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(cityName: String? = null) {
 
-    val repository = WeatherRepository()
+    val context = LocalContext.current
     val viewModel: HomeViewModel = viewModel(
-        factory = FavViewModelFactory(repository)
+        factory = HomeViewModelFactory(
+            weatherRepository = WeatherRepository(),
+            app = context.applicationContext as Application
+        )
     )
-    val weatherState = viewModel.weatherState.collectAsState()
-    val forecastState = viewModel.forecastState.collectAsState()
 
-    /*
-        val locationClient = remember {
-            LocationProvider(
-                fusedLocationClient = LocationServices.getFusedLocationProviderClient(
-                    context
-                )
-            )
+    val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
+    val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            if (isLocEnabled(context)) {
+                viewModel.loadWeatherForCurrentLocation()
+            } else {
+                enableLocationServices(context)
+                viewModel.loadWeatherForCurrentLocation()
+            }
         }
+    }
 
-        val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 
-        val permissionLauncher =
-            rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestMultiplePermissions()
-            ) { permissions ->
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-                val granted =
-                    permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] == true
-
-                if (granted) {
-                    if (isLocEnabled(context)) {
-                        lifecycleScope.launch {
-                            val location = locationClient.getCurrentLocation()
-                            viewModel.getCurrentWeather()
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (cityName != null) {
+                    viewModel.loadWeatherForSpecificLocation(cityName)
+                } else {
+                    if (Location.checkLocationPermission(context)) {
+                        if (isLocEnabled(context)) {
+                            viewModel.loadWeatherForCurrentLocation()
+                        } else {
+                            enableLocationServices(context)
+                            viewModel.loadWeatherForCurrentLocation()
                         }
                     } else {
-                        enableLocationServices(context)
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
                     }
                 }
             }
-
-        LaunchedEffect(Unit) {
-            if (Location.checkLocationPermission(context)) {
-                if (isLocEnabled(context)) {
-                    val location = locationClient.getCurrentLocation()
-                    viewModel.getCurrentWeather()
-                } else {
-                    enableLocationServices(context)
-                }
-            } else {
-                permissionLauncher.launch(
-                    arrayOf(
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
-                )
-            }
         }
-    */
-    HomeContent(weatherState.value, forecastState.value)
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    HomeContent(weatherState, forecastState)
 }
 
 @Composable
@@ -120,15 +147,12 @@ fun HomeContent(
         weatherState is ResultState.Loading || forecastState is ResultState.Loading -> {
             LoadingScreen(modifier = modifier.fillMaxSize())
         }
-
         weatherState is ResultState.Error -> {
             ErrorScreen(weatherState.message, modifier = modifier.fillMaxSize())
         }
-
         forecastState is ResultState.Error -> {
             ErrorScreen(forecastState.message, modifier = modifier.fillMaxSize())
         }
-
         weatherState is ResultState.Success && forecastState is ResultState.Success -> {
             HomeSuccessContent(
                 weather = weatherState.data,
@@ -283,23 +307,3 @@ private fun HomeSuccessContent(
         }
     }
 }
-
-//@Preview(showBackground = true, showSystemUi = true, backgroundColor = 0xFF352163)
-//@Composable
-//private fun HomePrev() {
-//    HomeContent(
-//        ResultState.Success(
-//            Weather(
-//                city = "Cairo",
-//                country = "Egypt",
-//                temperature = 30.0,
-//                humidity = 20,
-//                windSpeed = 90.0,
-//                pressure = 1000,
-//                clouds = 0,
-//                description = "Clear sky",
-//                icon = R.drawable.logo
-//            )
-//        ),
-//    )
-//}

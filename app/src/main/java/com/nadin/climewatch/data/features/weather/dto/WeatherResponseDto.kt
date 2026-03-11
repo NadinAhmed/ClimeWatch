@@ -1,10 +1,9 @@
 package com.nadin.climewatch.data.features.weather.dto
 
 import com.google.gson.annotations.SerializedName
-import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.model.Weather
 
-data class CurrentWeatherDto(
+data class WeatherResponseDto(
     val weather: List<WeatherDto>,
     @SerializedName("main")
     val mainInfo: MainDto,
@@ -19,7 +18,7 @@ data class CurrentWeatherDto(
     val city: String,
 )
 
-fun CurrentWeatherDto.toModel(): Weather {
+fun WeatherResponseDto.toModel(): Weather {
     return Weather(
         temperature = mainInfo.temp,
         humidity = mainInfo.humidity,

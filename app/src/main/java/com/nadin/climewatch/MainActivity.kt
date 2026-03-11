@@ -1,19 +1,20 @@
 package com.nadin.climewatch
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -43,15 +44,12 @@ import com.nadin.climewatch.presentation.features.alert.AlertScreen
 import com.nadin.climewatch.presentation.features.favourite.FavScreen
 import com.nadin.climewatch.presentation.features.home.HomeScreen
 import com.nadin.climewatch.presentation.features.settings.SettingsScreen
-import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.ClimeWatchTheme
-import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
-import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
-import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 import com.nadin.climewatch.presentation.utils.BottomNavItem
 import com.nadin.climewatch.presentation.utils.NavigationRoutes
 
+@RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +62,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen() {
 
@@ -97,7 +96,9 @@ fun MainScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val shouldShowBottomBar = currentRoute != null && currentRoute != NavigationRoutes.Splash.route
+    val shouldShowBottomBar = currentRoute != null &&
+        currentRoute != NavigationRoutes.Splash.route &&
+        currentRoute != NavigationRoutes.MapPicker.route
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -181,6 +182,7 @@ fun MainScreen() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

@@ -22,7 +22,6 @@ fun ErrorScreen (errorMessage: String, modifier: Modifier = Modifier) {
             errorMessage,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
-            modifier = modifier.fillMaxWidth()
         )
     }
 }
