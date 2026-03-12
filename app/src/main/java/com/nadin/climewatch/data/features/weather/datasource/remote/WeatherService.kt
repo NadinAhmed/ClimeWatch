@@ -39,4 +39,10 @@ interface WeatherService{
         @Query("lon") lon: Double,
         @Query("limit") limit: Int = 1
     ): List<CityDto>
+
+    @GET("geo/1.0/direct")
+    suspend fun getSuggestionCities(
+        @Query("q") query: String,
+        @Query("limit") limit: Int = 10
+    ): List<CityDto>
 }

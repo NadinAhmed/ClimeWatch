@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.room.util.query
 import com.google.android.gms.maps.model.LatLng
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.model.City
@@ -14,6 +15,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -27,11 +31,57 @@ class MapViewModel(private val repository: WeatherRepository) : ViewModel() {
     private val _cityState = MutableStateFlow<ResultState<City>>(ResultState.Loading)
     val cityState = _cityState.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    private val _suggestionsState =
+        MutableStateFlow<ResultState<List<City>>>(ResultState.Success(emptyList()))
+    val suggestionsState = _suggestionsState.asStateFlow()
+
     private val _isSaveEnabled = MutableStateFlow(false)
     val isSaveEnabled = _isSaveEnabled.asStateFlow()
 
     private val _mapEvent = MutableSharedFlow<MapEvent>()
     val mapEvent = _mapEvent.asSharedFlow()
+
+    private var isSelectingSuggestion = false
+
+    init {
+        viewModelScope.launch {
+            _searchQuery
+                .debounce(500)
+                .distinctUntilChanged()
+                .collectLatest { query ->
+                    if (isSelectingSuggestion) {
+                        isSelectingSuggestion = false
+                        return@collectLatest
+                    }
+                    if (query.length >= 2) fetchSuggestions(query)
+                    else _suggestionsState.value = ResultState.Success(emptyList())
+                }
+        }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
+    }
+
+    private fun fetchSuggestions(query: String) {
+        viewModelScope.launch {
+            repository.getSuggestionCities(query).collect {
+                _suggestionsState.value = it
+            }
+        }
+    }
+
+    fun onSuggestionSelected(city: City) {
+        isSelectingSuggestion = true
+        _selectedLocation.value = LatLng(city.lat, city.lon)
+        _isSaveEnabled.value = true
+        _cityState.value = ResultState.Success(city)
+        _searchQuery.value = "${city.name}, ${city.country}"
+        _suggestionsState.value = ResultState.Success(emptyList())
+    }
 
     fun onLocationSelected(geoCode: LatLng) {
         _selectedLocation.value = geoCode

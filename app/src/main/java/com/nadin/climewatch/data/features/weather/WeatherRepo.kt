@@ -103,4 +103,21 @@ class WeatherRepository(context: Context) {
             .map { locations -> ResultState.Success(locations) as ResultState<List<FavoriteLocation>> }
             .onStart { emit(ResultState.Loading) }
             .catch { e -> emit(ResultState.Error(e.message ?: "Unknown error")) }
+
+
+    fun getSuggestionCities(query: String): Flow<ResultState<List<City>>> = flow {
+        if (query.length < 2) {
+            emit(ResultState.Success(emptyList()))
+            return@flow
+        }
+
+        emit(ResultState.Loading)
+        try {
+            val response = remoteDataSource.getSuggestionCities(query)
+            emit(ResultState.Success(response.map { it.toModel() }))
+        } catch (e: Exception) {
+            emit(ResultState.Error(e.message ?: "Unknown error"))
+        }
+
+    }
 }

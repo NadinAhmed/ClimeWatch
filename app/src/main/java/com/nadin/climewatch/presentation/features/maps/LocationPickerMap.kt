@@ -6,14 +6,32 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,9 +43,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -35,9 +55,18 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.ktx.model.cameraPosition
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
+import com.nadin.climewatch.data.features.weather.model.City
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
+import com.nadin.climewatch.presentation.ui.theme.ButtonLightColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryLightColor
+import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
+import com.nadin.climewatch.presentation.utils.components.Spacers
+import com.nadin.climewatch.presentation.utils.states.ResultState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -54,11 +83,25 @@ fun LocationPickerMap(
     val selectedLocation by viewModel.selectedLocation.collectAsState()
     val locationName by viewModel.locationName.collectAsState()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsState()
+    val cityState by viewModel.cityState.collectAsState()
+    val suggestionsState by viewModel.suggestionsState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
-//    val singapore = LatLng(51.52061810406676, -0.12635325270312533)
-//    val cameraPositionState = rememberCameraPositionState {
-//        position = CameraPosition.fromLatLngZoom(singapore, 10f)
-//    }
+    val cairo = LatLng(30.0444, 31.2357)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(
+            cairo,
+            10f
+        )
+    }
+
+    LaunchedEffect(selectedLocation) {
+        selectedLocation?.let {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(it, 10f)
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.mapEvent.collect { event ->
@@ -71,13 +114,6 @@ fun LocationPickerMap(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        val cairo = LatLng(30.0444, 31.2357)
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(
-                cairo,
-                10f
-            )
-        }
 
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -87,9 +123,116 @@ fun LocationPickerMap(
             selectedLocation?.let {
                 Marker(
                     state = MarkerState(position = it),
-                    title = locationName,
+                    title = if (cityState is ResultState.Success)
+                        (cityState as ResultState.Success<City>).data.name else "",
                     icon = BitmapDescriptorFactory.fromResource(R.drawable.map_marker)
                 )
+            }
+        }
+
+        // Search Bar + Suggestions
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.TopCenter)
+        ) {
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { viewModel.onSearchQueryChanged(it) },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(stringResource(R.string.search_for_city)) },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = "search")
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
+                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(20.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = SecondaryTextColor,
+                    unfocusedContainerColor = SecondaryTextColor,
+                    focusedTextColor = PrimaryDarkColor,
+                    unfocusedTextColor = PrimaryDarkColor,
+                    focusedBorderColor = ButtonLightColor,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f)
+                )
+            )
+
+            Spacers.VerticalSpacer(4.dp)
+
+            // Suggestions Dropdown
+            when (val state = suggestionsState) {
+                is ResultState.Loading -> {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = SecondaryTextColor)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = ButtonLightColor
+                            )
+                        }
+                    }
+                }
+
+                is ResultState.Success -> {
+                    if (state.data.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(containerColor = SecondaryTextColor)
+                        ) {
+                            state.data.forEach { city ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { viewModel.onSuggestionSelected(city) }
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.LocationOn,
+                                        contentDescription = null,
+                                        tint = ButtonLightColor,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacers.HorizontalSpacer(8.dp)
+                                    Column {
+                                        Text(
+                                            text = city.name,
+                                            color = PrimaryDarkColor,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            text = city.country,
+                                            color = PrimaryDarkColor.copy(alpha = 0.7f),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+                                if (city != state.data.last()) {
+                                    HorizontalDivider(color = Color.White.copy(alpha = 0.3f), thickness = 1.dp)
+                                }
+                            }
+                        }
+                    }
+                }
+                else -> {}
             }
         }
 

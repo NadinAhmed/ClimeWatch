@@ -82,4 +82,16 @@ class WeatherRemoteDatasource(
             throw NetworkException()
         }
     }
+
+    suspend fun getSuggestionCities(
+        query: String
+    ): List<CityDto> {
+        return try {
+            RetrofitInstance.weatherService.getSuggestionCities(query)
+        } catch (e: HttpException) {
+            throw ServerException()
+        } catch (e: IOException) {
+            throw NetworkException()
+        }
+    }
 }
