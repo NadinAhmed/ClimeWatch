@@ -5,8 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
@@ -41,35 +42,43 @@ fun WeeklyForecastItem(
                 color = LabelLightColor,
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(vertical = 10.dp, horizontal = 12.dp)
+            .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                day,
-                style = MaterialTheme.typography.titleSmall
+            Image(
+                painter = painterResource(weatherIconRes),
+                contentDescription = "Weather Icon",
+                modifier = Modifier.size(44.dp)
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                Image(
-                    painter = painterResource(weatherIconRes),
-                    contentDescription = "Weather Icon",
-                    modifier = Modifier.size(40.dp)
+                Text(
+                    text = day,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
                 Text(
-                    weatherDescription,
-                    style = MaterialTheme.typography.bodyMedium.copy(letterSpacing = 0.sp)
+                    text = weatherDescription,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
 
             Text(
-                "$temperature °",
-                style = MaterialTheme.typography.titleSmall
+                text = "${temperature.toInt()}°",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
             )
         }
     }

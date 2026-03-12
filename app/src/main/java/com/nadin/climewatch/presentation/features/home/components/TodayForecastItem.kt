@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
 import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
@@ -59,7 +60,7 @@ fun TodayForecastItem(hour: String, temperature: Double, weatherIconRes: Int) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "$temperature °",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp)
             )
         }
     }

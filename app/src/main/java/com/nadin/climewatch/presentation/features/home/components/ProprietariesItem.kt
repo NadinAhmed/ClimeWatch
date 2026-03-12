@@ -13,8 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 
 @Composable
 fun ProprietariesItem (@DrawableRes iconRes: Int ,data: Int ,label: String) {
@@ -28,7 +30,7 @@ fun ProprietariesItem (@DrawableRes iconRes: Int ,data: Int ,label: String) {
             contentDescription = "Icon",
             modifier = Modifier.size(24.dp)
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = "$data",
             style = MaterialTheme.typography.titleMedium
