@@ -18,4 +18,7 @@
     <string name="location_permission_message">Clime Watch needs your location to show the correct forecast. Please grant access.</string>
     <string name="grant_location_access">Grant Access</string>
     <string name="open_settings">Open Settings</string>
+    <string name="no_favourite_locations_yet">No Favourite Locations ,Yet</string>
+    <string name="tap_to_add_one">Tap + to Add One</string>
+    <string name="save">Save</string>
 </resources>

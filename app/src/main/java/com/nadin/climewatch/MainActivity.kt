@@ -31,10 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.bottombar.AnimatedBottomBar
 import com.example.bottombar.components.BottomBarItem
 import com.example.bottombar.model.IndicatorStyle
@@ -42,6 +44,7 @@ import com.example.bottombar.model.VisibleItem
 import com.nadin.climewatch.presentation.features.SplashScreen
 import com.nadin.climewatch.presentation.features.alert.AlertScreen
 import com.nadin.climewatch.presentation.features.favourite.FavScreen
+import com.nadin.climewatch.presentation.features.maps.LocationPickerMap
 import com.nadin.climewatch.presentation.features.home.HomeScreen
 import com.nadin.climewatch.presentation.features.settings.SettingsScreen
 import com.nadin.climewatch.presentation.ui.theme.ClimeWatchTheme
@@ -97,8 +100,8 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val shouldShowBottomBar = currentRoute != null &&
-        currentRoute != NavigationRoutes.Splash.route &&
-        currentRoute != NavigationRoutes.MapPicker.route
+            currentRoute != NavigationRoutes.Splash.route &&
+            currentRoute != NavigationRoutes.MapPicker.route
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -174,10 +177,21 @@ fun MainScreen() {
                     }
                 })
             }
-            composable(NavigationRoutes.Home.route) { HomeScreen() }
-            composable(NavigationRoutes.Favourite.route) { FavScreen() }
+            composable(
+                route = NavigationRoutes.Home.route,
+                arguments = listOf(
+                    navArgument("lat") { type = NavType.StringType; defaultValue = "" },
+                    navArgument("lon") { type = NavType.StringType; defaultValue = "" }
+                )
+            ) { backStackEntry ->
+                val lat = backStackEntry.arguments?.getString("lat")?.toDoubleOrNull()
+                val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
+                HomeScreen(lat = lat, lon = lon)
+            }
+            composable(NavigationRoutes.Favourite.route) {FavScreen(navController)}
             composable(NavigationRoutes.Alerts.route) { AlertScreen() }
             composable(NavigationRoutes.Settings.route) { SettingsScreen() }
+            composable(NavigationRoutes.MapPicker.route) {LocationPickerMap(navController)}
         }
     }
 }

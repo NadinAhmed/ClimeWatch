@@ -80,7 +80,7 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
     val context = LocalContext.current
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
-            weatherRepository = WeatherRepository(),
+            weatherRepository = WeatherRepository(context),
             app = context.applicationContext as Application
         )
     )

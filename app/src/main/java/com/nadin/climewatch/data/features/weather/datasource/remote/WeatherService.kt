@@ -2,6 +2,7 @@ package com.nadin.climewatch.data.features.weather.datasource.remote
 
 import com.nadin.climewatch.data.features.weather.dto.WeatherResponseDto
 import com.nadin.climewatch.data.features.weather.dto.ForecastResponseDto
+import com.nadin.climewatch.data.features.weather.dto.CityDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -31,4 +32,11 @@ interface WeatherService{
         @Query("q") city: String,
         @Query("units") units: String = "metric",
     ): ForecastResponseDto
+
+    @GET("geo/1.0/reverse")
+    suspend fun getCityByGeoCode(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("limit") limit: Int = 1
+    ): List<CityDto>
 }

@@ -43,6 +43,12 @@ android {
             "WEATHER_API_KEY",
             "\"${localProperties["WEATHER_API_KEY"]}\""
         )
+        buildConfigField(
+            "String",
+            "GOOGLE_MAPS_API_KEY",
+            "\"${localProperties["GOOGLE_MAPS_API_KEY"]}\""
+        )
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = localProperties["GOOGLE_MAPS_API_KEY"] ?: ""
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -101,4 +107,8 @@ dependencies {
 
     //Animated Bottom Nav Bar
     implementation(libs.bottombar)
+
+    //Google Maps
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
 }
