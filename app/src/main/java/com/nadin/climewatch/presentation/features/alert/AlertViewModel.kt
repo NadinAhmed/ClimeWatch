@@ -14,9 +14,7 @@ import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.entites.Alert
 import com.nadin.climewatch.presentation.service.worker.AlertWorker
 import com.nadin.climewatch.presentation.utils.states.ResultState
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -45,8 +43,10 @@ class AlertViewModel(
 
     fun insertAlert(alert: Alert, city: String) {
         viewModelScope.launch {
-            repository.insertAlert(alert)
-            scheduleAlert(alert, city)
+            val alertId = repository.insertAlert(alert)
+            if (alertId != -1) {
+                scheduleAlert(alert.copy(id = alertId), city)
+            }
         }
     }
 
@@ -66,8 +66,10 @@ class AlertViewModel(
         if (delay < 0) return
 
         val inputData = workDataOf(
+            AlertWorker.EXTRA_ALERT_ID to alert.id,
             AlertWorker.EXTRA_ALERT_TYPE to alert.alertType.name,
             AlertWorker.EXTRA_CITY to city,
+            AlertWorker.EXTRA_END_TIME to alert.endTime,
         )
 
         val workRequest = PeriodicWorkRequestBuilder<AlertWorker>(

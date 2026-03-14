@@ -22,21 +22,27 @@ class AlertWorker(
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
+        const val EXTRA_ALERT_ID = "alert_id"
         const val EXTRA_ALERT_TYPE = "alert_type"
         const val EXTRA_CITY = "alert_city"
+        const val EXTRA_END_TIME = "alert_end_time"
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun doWork(): Result {
-        val alertTypeString = inputData.getString("alert_type")
-        val alertType = AlertType.valueOf(alertTypeString ?: return Result.failure())
+        val alertId = inputData.getInt(EXTRA_ALERT_ID, -1)
+        if (alertId == -1) return Result.failure()
+
+        val alertTypeString = inputData.getString(EXTRA_ALERT_TYPE) ?: return Result.failure()
+        val alertType = AlertType.valueOf(alertTypeString)
         val city = inputData.getString(EXTRA_CITY) ?: return Result.failure()
-        val endTime = System.currentTimeMillis() + 15 * 60 * 1000 // 15 minutes from now
+        val endTime = inputData.getLong(EXTRA_END_TIME, -1L)
+        if (endTime <= 0L) return Result.failure()
 
         if (System.currentTimeMillis() > endTime) {
-            WorkManager.getInstance(context).cancelUniqueWork(id.toString())
+            WorkManager.getInstance(context).cancelUniqueWork(alertId.toString())
             return Result.success()
         }
 
@@ -58,7 +64,7 @@ class AlertWorker(
             }
 
         } catch (e: Exception) {
-            Result.Retry()
+            Result.retry()
         }
     }
 

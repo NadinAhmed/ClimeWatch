@@ -89,7 +89,7 @@ fun AlertItem(
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = "Delete Alert",
-                    tint = Color.Red.copy(alpha = 0.8f)
+                    tint = Color.Red.copy(alpha = 0.3f)
                 )
             }
         }

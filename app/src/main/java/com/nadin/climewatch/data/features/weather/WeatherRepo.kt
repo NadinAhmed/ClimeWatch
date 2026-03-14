@@ -124,8 +124,8 @@ class WeatherRepository(context: Context) {
 
     }
 
-    suspend fun insertAlert(alert: Alert) {
-        alertLocalDataSource.insertAlert(alert)
+    suspend fun insertAlert(alert: Alert): Int {
+        return alertLocalDataSource.insertAlert(alert)
     }
 
     suspend fun deleteAlert(alert: Alert) {

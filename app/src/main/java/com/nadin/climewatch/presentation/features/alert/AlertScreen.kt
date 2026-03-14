@@ -1,13 +1,14 @@
 package com.nadin.climewatch.presentation.features.alert
 
-import android.app.Application
+import android.Manifest
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,13 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,23 +31,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.presentation.features.alert.components.AddAlertBottomSheet
 import com.nadin.climewatch.presentation.features.alert.components.AlertItem
-import com.nadin.climewatch.presentation.features.favourite.FavViewModel
-import com.nadin.climewatch.presentation.features.favourite.FavViewModelFactory
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.utils.components.EmptyScreen
 import com.nadin.climewatch.presentation.utils.components.ErrorScreen
 import com.nadin.climewatch.presentation.utils.components.LoadingScreen
-import com.nadin.climewatch.presentation.utils.components.Spacers
 import com.nadin.climewatch.presentation.utils.states.ResultState
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -66,8 +58,24 @@ fun AlertScreen() {
         )
     )
 
+    val shouldRequestNotificationPermission =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
     val alertsState by viewModel.alertsState.collectAsStateWithLifecycle()
     var showBottomSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(shouldRequestNotificationPermission) {
+        if (!shouldRequestNotificationPermission) return@LaunchedEffect
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     Scaffold(
         containerColor = Color.Transparent,
