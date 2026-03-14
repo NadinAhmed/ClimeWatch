@@ -30,7 +30,8 @@ class AlertWorker(
     @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun doWork(): Result {
-        val alertType = inputData.getString(EXTRA_ALERT_TYPE) ?: return Result.failure()
+        val alertTypeString = inputData.getString("alert_type")
+        val alertType = AlertType.valueOf(alertTypeString ?: return Result.failure())
         val city = inputData.getString(EXTRA_CITY) ?: return Result.failure()
         val endTime = System.currentTimeMillis() + 15 * 60 * 1000 // 15 minutes from now
 
@@ -45,8 +46,8 @@ class AlertWorker(
                 val weather = weatherData.getOrNull()
                 if (weather != null) {
                     when (alertType) {
-                        AlertType.NOTIFICATION.name -> showNotification(weather)
-                        AlertType.ALARM.name -> startAlarmService(weather)
+                        AlertType.NOTIFICATION -> showNotification(weather)
+                        AlertType.ALARM -> startAlarmService(weather)
                     }
                     Result.success()
                 } else {

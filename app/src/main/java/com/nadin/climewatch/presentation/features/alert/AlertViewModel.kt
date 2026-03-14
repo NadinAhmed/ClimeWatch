@@ -66,7 +66,7 @@ class AlertViewModel(
         if (delay < 0) return
 
         val inputData = workDataOf(
-            AlertWorker.EXTRA_ALERT_TYPE to alert.alertType,
+            AlertWorker.EXTRA_ALERT_TYPE to alert.alertType.name,
             AlertWorker.EXTRA_CITY to city,
         )
 
