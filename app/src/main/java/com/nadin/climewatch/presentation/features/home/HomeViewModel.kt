@@ -11,6 +11,7 @@ import com.google.android.gms.location.LocationServices
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.model.Forecast
 import com.nadin.climewatch.data.features.weather.model.Weather
+import com.nadin.climewatch.data.local.CityPreferences
 import com.nadin.climewatch.presentation.utils.Location
 import com.nadin.climewatch.presentation.utils.states.LocationSource
 import com.nadin.climewatch.presentation.utils.states.ResultState
@@ -76,7 +77,10 @@ class HomeViewModel(
 
     private suspend fun fetchWeatherAndForecast(lat: Double, lon: Double) {
         repository.getWeatherByGeoCode(lat, lon)
-            .onSuccess { _weatherState.value = ResultState.Success(it) }
+            .onSuccess {
+                _weatherState.value = ResultState.Success(it)
+                CityPreferences.saveCurrentCity(app, it.city)
+            }
             .onFailure { _weatherState.value = ResultState.Error(it.message ?: "Unknown error") }
 
         repository.getForecastByGeoCode(lat, lon)
@@ -85,7 +89,10 @@ class HomeViewModel(
 
     private suspend fun fetchWeatherAndForecastByCity(cityName: String) {
         repository.getWeatherByCity(cityName)
-            .onSuccess { _weatherState.value = ResultState.Success(it) }
+            .onSuccess {
+                _weatherState.value = ResultState.Success(it)
+                CityPreferences.saveCurrentCity(app, it.city)
+            }
             .onFailure { _weatherState.value = ResultState.Error(it.message ?: "Unknown error") }
 
         repository.getForecastByCity(cityName)

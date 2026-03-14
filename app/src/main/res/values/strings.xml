@@ -34,4 +34,6 @@
     <string name="from">"From:\t"</string>
     <string name="to">"To:\t"</string>
     <string name="alert_type">Alert Type</string>
+    <string name="weather_update">Weather Update</string>
+    <string name="weather_alarm">Weather Alarm</string>
 </resources>

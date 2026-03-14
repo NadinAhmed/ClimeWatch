@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
+import com.nadin.climewatch.data.local.CityPreferences
 import com.nadin.climewatch.presentation.features.alert.components.AddAlertBottomSheet
 import com.nadin.climewatch.presentation.features.alert.components.AlertItem
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
@@ -65,6 +66,11 @@ fun AlertScreen() {
 
     val alertsState by viewModel.alertsState.collectAsStateWithLifecycle()
     var showBottomSheet by remember { mutableStateOf(false) }
+    var currentCity by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        currentCity = CityPreferences.getCurrentCity(context)
+    }
 
     LaunchedEffect(shouldRequestNotificationPermission) {
         if (!shouldRequestNotificationPermission) return@LaunchedEffect
@@ -136,7 +142,8 @@ fun AlertScreen() {
                 onSave = { alert, city ->
                     viewModel.insertAlert(alert, city)
                     showBottomSheet = false
-                }
+                },
+                currentCity = currentCity
             )
         }
     }

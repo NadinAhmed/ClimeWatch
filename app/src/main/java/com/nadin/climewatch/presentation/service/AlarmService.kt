@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.os.IBinder
 import androidx.annotation.RequiresPermission
 import com.nadin.climewatch.presentation.service.notification.NotificationHelper
+import java.util.Locale
 
 class AlarmService : Service() {
 
@@ -33,7 +34,11 @@ class AlarmService : Service() {
         when (intent?.action) {
             ACTION_DISMISS -> stopAlarm()
             else -> {
-                val temperature = intent?.getStringExtra(EXTRA_TEMPERATURE) ?: ""
+                val temperatureValue = intent?.getDoubleExtra(EXTRA_TEMPERATURE, Double.NaN)
+                val temperature = temperatureValue
+                    ?.takeUnless { it.isNaN() }
+                    ?.let { formatTemperature(it) }
+                    ?: ""
                 val description = intent?.getStringExtra(EXTRA_DESCRIPTION) ?: ""
                 val city = intent?.getStringExtra(EXTRA_CITY) ?: ""
 
@@ -85,4 +90,12 @@ class AlarmService : Service() {
     }
 
     override fun onBind(intent: Intent): IBinder? = null
+
+    private fun formatTemperature(value: Double): String {
+        return if (value % 1.0 == 0.0) {
+            value.toInt().toString()
+        } else {
+            String.format(Locale.getDefault(), "%.1f", value)
+        }
+    }
 }

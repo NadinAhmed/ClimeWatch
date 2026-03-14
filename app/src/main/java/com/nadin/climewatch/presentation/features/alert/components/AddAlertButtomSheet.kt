@@ -48,7 +48,8 @@ import com.nadin.climewatch.presentation.utils.components.Spacers
 @Composable
 fun AddAlertBottomSheet(
     onDismiss: () -> Unit,
-    onSave: (Alert, String) -> Unit
+    onSave: (Alert, String) -> Unit,
+    currentCity: String? = null
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -164,21 +165,23 @@ fun AddAlertBottomSheet(
                 )
             }
             Spacers.VerticalSpacer(20.dp)
+            val canSaveAlert = startTime != null && endTime != null && !currentCity.isNullOrBlank()
             Button(
                 onClick = {
-                    if (startTime != null && endTime != null) {
+                    val city = currentCity
+                    if (startTime != null && endTime != null && !city.isNullOrBlank()) {
                         onSave(
                             Alert(
                                 startTime = startTime!!,
                                 endTime = endTime!!,
                                 alertType = alertType
                             ),
-                            "Cairo"
+                            city
                         )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = startTime != null && endTime != null,
+                enabled = canSaveAlert,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryColor,
                     contentColor = Color.White,
