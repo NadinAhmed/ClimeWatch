@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.nadin.climewatch.R
@@ -115,8 +116,21 @@ fun FavScreen(navController: NavController) {
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp)
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            item {
+                                Text(
+                                    text = stringResource(R.string.favourite_locations),
+                                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.favourite_locations_decsription),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(bottom = 16.dp)
+                                )
+                            }
                             items(state.data, key = { it.id }) { location ->
                                 FavCard(
                                     modifier = Modifier.animateItem(),
@@ -124,7 +138,6 @@ fun FavScreen(navController: NavController) {
                                     onClick = { viewModel.onFavCardClicked(location) },
                                     onDelete = { viewModel.deleteLocation(location) }
                                 )
-                                Spacers.VerticalSpacer(8.dp)
                             }
                         }
                     }

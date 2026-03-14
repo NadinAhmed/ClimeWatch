@@ -3,7 +3,6 @@
     <string name="splash_tagline">Track severe weather alerts and forecasts anywhere.</string>
     <string name="home">Home</string>
     <string name="favourite">Favourite</string>
-    <string name="alerts">Alerts</string>
     <string name="settings">Settings</string>
     <string name="turn_on_location">Turn on Location</string>
     <string name="server_error_message">Can\'t connect to Server.\n Please try again.</string>
@@ -36,4 +35,8 @@
     <string name="alert_type">Alert Type</string>
     <string name="weather_update">Weather Update</string>
     <string name="weather_alarm">Weather Alarm</string>
+    <string name="alerts">Alerts</string>
+    <string name="alerts_decsription">for timely weather updates</string>
+    <string name="favourite_locations">Favorite Locations</string>
+    <string name="favourite_locations_decsription">for quick access to weather updates</string>
 </resources>
