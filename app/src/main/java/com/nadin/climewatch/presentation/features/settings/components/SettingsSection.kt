@@ -1,5 +1,6 @@
 package com.nadin.climewatch.presentation.features.settings.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -12,7 +13,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
+import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 
 @Composable
 fun SettingsSection(
@@ -22,15 +26,22 @@ fun SettingsSection(
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = title.uppercase(),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineMedium
+                .copy(color = Color.White.copy(alpha = 0.9f)),
             modifier = Modifier.padding(start = 4.dp)
+
         )
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = LabelLightColor,
+                    shape = RoundedCornerShape(16.dp)
+                ),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = Color.White.copy(alpha = 0.1f)
             )
         ) {
             Column(modifier = Modifier.padding(4.dp)) {

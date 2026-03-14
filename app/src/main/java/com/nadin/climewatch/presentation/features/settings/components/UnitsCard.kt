@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.model.Units
+import com.nadin.climewatch.presentation.features.settings.UnitOption
 
 @Composable
 fun UnitsSettingsCard(
@@ -21,19 +22,28 @@ fun UnitsSettingsCard(
     onUnitsSelected: (Units) -> Unit
 ) {
     val options = listOf(
-        Triple(Units.METRIC, Icons.Default.Thermostat, stringResource(R.string.matric)),
-        Triple(Units.IMPERIAL, Icons.Default.WbSunny, stringResource(R.string.imperial)),
-        Triple(Units.STANDARD, Icons.Default.Science, stringResource(R.string.standard))
+        UnitOption(
+            Units.METRIC, Icons.Default.Thermostat,
+            stringResource(R.string.metric), stringResource(R.string.c_m_s_mm)
+        ),
+        UnitOption(
+            Units.IMPERIAL, Icons.Default.WbSunny,
+            stringResource(R.string.imperial), stringResource(R.string.f_mph_in)
+        ),
+        UnitOption(
+            Units.STANDARD, Icons.Default.Science,
+            stringResource(R.string.standard), stringResource(R.string.k_m_s_mm)
+        )
     )
 
     Column {
-        options.forEachIndexed { index, (unit, icon, title) ->
+        options.forEachIndexed { index, (unit, icon, title, subtitle) ->
             SettingsOptionRow(
                 icon = icon,
                 title = title,
                 selected = selectedUnits == unit,
                 onClick = { onUnitsSelected(unit) },
-                subtitle = "",
+                subtitle = subtitle,
             )
             if (index < options.lastIndex) {
                 HorizontalDivider(

@@ -39,6 +39,14 @@ val Typography = Typography(
         color = Color.White,
         letterSpacing = 0.sp
     ),
+    bodyLarge = TextStyle(
+        fontFamily = PoppinsFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp,
+        lineHeight = 28.sp,
+        color = Color.White,
+        letterSpacing = 0.sp
+    ),
     bodyMedium = TextStyle(
         fontFamily = PoppinsFontFamily,
         fontWeight = FontWeight.Normal,

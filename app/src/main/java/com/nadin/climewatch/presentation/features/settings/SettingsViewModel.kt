@@ -56,7 +56,8 @@ class SettingsViewModel(
                         "en" -> AppLanguage.ENGLISH
                         "ar" -> AppLanguage.ARABIC
                         else -> AppLanguage.ENGLISH
-                    }
+                    },
+                    isLoading = false
                 )
             }.collect {
                 _state.value = it
@@ -72,15 +73,9 @@ class SettingsViewModel(
                     LocationMode.MAP -> "map"
                 }
             )
-            if(mode == LocationMode.MAP) {
+            if (mode == LocationMode.MAP) {
                 _event.emit(SettingsEvent.OpenMapPicker)
             }
-        }
-    }
-
-    fun onMapLocationPicked(lat: Double, lon: Double) {
-        viewModelScope.launch {
-            settingsDataStore.saveSelectedLocation(lat, lon)
         }
     }
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.model.AppLanguage
+import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
 
 @Composable
 fun LanguageSettingsCard(
@@ -22,20 +23,20 @@ fun LanguageSettingsCard(
         SettingsOptionRow(
             icon     = Icons.Default.Language,
             title    = stringResource(R.string.english),
-            subtitle = "en",
+            subtitle = stringResource(R.string.en),
             selected = selectedLanguage == AppLanguage.ENGLISH,
             onClick  = { onLanguageSelected(AppLanguage.ENGLISH) }
         )
 
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+            color = LabelLightColor
         )
 
         SettingsOptionRow(
             icon     = Icons.Default.Language,
             title    = stringResource(R.string.arabic),
-            subtitle = "ar",
+            subtitle = stringResource(R.string.ar),
             selected = selectedLanguage == AppLanguage.ARABIC,
             onClick  = { onLanguageSelected(AppLanguage.ARABIC) }
         )

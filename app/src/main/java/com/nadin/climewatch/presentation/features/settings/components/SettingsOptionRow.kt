@@ -16,8 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
+import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
+import com.nadin.climewatch.presentation.utils.components.Spacers
 
 @Composable
 fun SettingsOptionRow(
@@ -39,25 +44,29 @@ fun SettingsOptionRow(
             imageVector = icon,
             contentDescription = null,
             tint = if (selected)
-                MaterialTheme.colorScheme.primary
+                Color(0xFFC6A7FF)
             else
-                MaterialTheme.colorScheme.onSurfaceVariant,
+                Color(0xFF9B86B8),
             modifier = Modifier.size(24.dp)
         )
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text  = title,
-                style = MaterialTheme.typography.bodyLarge,
+                text = title,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal),
                 color = if (selected)
-                    MaterialTheme.colorScheme.primary
+                    Color.White
                 else
-                    MaterialTheme.colorScheme.onSurfaceVariant
+                    Color(0xFFCFC3E6)
             )
+            Spacers.VerticalSpacer(4.dp)
             Text(
-                text  = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal),
+                color = if (selected)
+                    Color(0xFFD6C6FF)
+                else
+                    Color(0xFF9E8FB8)
             )
         }
 
@@ -65,7 +74,7 @@ fun SettingsOptionRow(
             Icon(
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Color(0xFFB892FF),
                 modifier = Modifier.size(20.dp)
             )
         }
