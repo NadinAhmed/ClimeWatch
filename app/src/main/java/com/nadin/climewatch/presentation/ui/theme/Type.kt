@@ -55,4 +55,20 @@ val Typography = Typography(
         color = SecondaryTextColor,
         letterSpacing = 0.sp
     ),
+    headlineMedium = TextStyle(
+        fontFamily = PoppinsFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 16.sp,
+        color = PrimaryColor,
+        letterSpacing = 0.sp
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = PoppinsFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = 20.sp,
+        color = PrimaryColor,
+        letterSpacing = 0.sp
+    )
 )

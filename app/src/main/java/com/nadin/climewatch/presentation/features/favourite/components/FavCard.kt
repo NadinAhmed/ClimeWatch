@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
@@ -35,12 +34,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.IconBackgroundColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
-import com.nadin.climewatch.presentation.ui.theme.PrimaryLightColor
 import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 import com.nadin.climewatch.presentation.utils.components.Spacers
 

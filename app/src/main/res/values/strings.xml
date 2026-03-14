@@ -22,4 +22,16 @@
     <string name="tap_to_add_one">Tap + to Add One</string>
     <string name="save">Save</string>
     <string name="search_for_city">Search for a city...</string>
+    <string name="weather_alarets">Weather Alerts</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_alerts_yet">No Alerts ,Yet</string>
+    <string name="new_weather_alert">New Weather Alert</string>
+    <string name="select_start_time">"Select Start Time"</string>
+    <string name="select_end_time">"Select End Time"</string>
+    <string name="from">"From:\t"</string>
+    <string name="to">"To:\t"</string>
+    <string name="alert_type">Alert Type</string>
 </resources>

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.nadin.climewatch.data.features.weather.WeatherRepository
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import com.nadin.climewatch.presentation.utils.states.ResultState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted

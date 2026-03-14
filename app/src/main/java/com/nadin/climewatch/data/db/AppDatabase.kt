@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.nadin.climewatch.data.features.weather.datasource.local.AlertDao
 import com.nadin.climewatch.data.features.weather.datasource.local.FavLocationDao
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.Alert
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 
-@Database(entities = [FavoriteLocation::class], version = 1)
+@Database(entities = [FavoriteLocation::class, Alert::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favLocationsDao(): FavLocationDao
+    abstract fun alertDao(): AlertDao
 
     companion object {
         @Volatile
@@ -20,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "favorites_locations"
+                    "weather_database"
                 ).build()
                 INSTANCE = instance
                 instance

@@ -39,6 +39,7 @@ import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.presentation.features.favourite.components.FavCard
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.utils.NavigationRoutes
+import com.nadin.climewatch.presentation.utils.components.EmptyScreen
 import com.nadin.climewatch.presentation.utils.components.ErrorScreen
 import com.nadin.climewatch.presentation.utils.components.LoadingScreen
 import com.nadin.climewatch.presentation.utils.components.Spacers
@@ -106,28 +107,11 @@ fun FavScreen(navController: NavController) {
 
                 is ResultState.Success -> {
                     if (state.data.isEmpty()) {
-                        Column(
-                            modifier = Modifier.align(Alignment.Center),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.FavoriteBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.outline
-                            )
-                            Text(
-                                text = stringResource(R.string.no_favourite_locations_yet),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                            Text(
-                                text = stringResource(R.string.tap_to_add_one),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-                        }
+                        EmptyScreen(
+                            R.drawable.heart,
+                            stringResource(R.string.no_favourite_locations_yet),
+                            stringResource(R.string.tap_to_add_one)
+                        )
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),

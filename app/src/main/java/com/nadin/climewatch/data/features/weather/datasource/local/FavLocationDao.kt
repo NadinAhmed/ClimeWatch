@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -24,7 +24,10 @@ private val AppColorScheme = darkColorScheme(
     onTertiary = Color.White,
     onBackground = SecondaryTextColor,
     onSurface = PrimaryColor,
-    onSurfaceVariant = PrimaryColor
+    onSurfaceVariant = PrimaryColor,
+    surfaceContainer = SecondaryTextColor,
+    surfaceContainerLow = SecondaryTextColor,
+    surfaceContainerHigh = SecondaryTextColor
 )
 
 @Composable

@@ -5,11 +5,10 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.query
 import com.google.android.gms.maps.model.LatLng
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.model.City
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import com.nadin.climewatch.presentation.utils.states.ResultState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

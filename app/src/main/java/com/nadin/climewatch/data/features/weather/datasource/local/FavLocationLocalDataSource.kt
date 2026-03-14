@@ -2,7 +2,7 @@ package com.nadin.climewatch.data.features.weather.datasource.local
 
 import android.content.Context
 import com.nadin.climewatch.data.db.AppDatabase
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 
 class FavLocationLocalDataSource(context: Context) {
     val favLocationDao: FavLocationDao = AppDatabase.getInstance(context).favLocationsDao()

@@ -4,12 +4,14 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
+import com.nadin.climewatch.data.features.weather.datasource.local.AlertLocalDataSource
 import com.nadin.climewatch.data.features.weather.datasource.local.FavLocationLocalDataSource
 import com.nadin.climewatch.data.features.weather.datasource.remote.WeatherRemoteDatasource
 import com.nadin.climewatch.data.features.weather.dto.toForecast
 import com.nadin.climewatch.data.features.weather.dto.toModel
+import com.nadin.climewatch.data.features.weather.entites.Alert
 import com.nadin.climewatch.data.features.weather.model.City
-import com.nadin.climewatch.data.features.weather.model.FavoriteLocation
+import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import com.nadin.climewatch.data.features.weather.model.Forecast
 import com.nadin.climewatch.data.features.weather.model.Weather
 import com.nadin.climewatch.presentation.utils.states.ResultState
@@ -22,7 +24,8 @@ import kotlinx.coroutines.flow.onStart
 @RequiresApi(Build.VERSION_CODES.O)
 class WeatherRepository(context: Context) {
     private val remoteDataSource: WeatherRemoteDatasource = WeatherRemoteDatasource()
-    private val localDataSource: FavLocationLocalDataSource = FavLocationLocalDataSource(context)
+    private val favLocalDataSource: FavLocationLocalDataSource = FavLocationLocalDataSource(context)
+    private val alertLocalDataSource: AlertLocalDataSource = AlertLocalDataSource(context)
     suspend fun getWeatherByGeoCode(
         lat: Double,
         lon: Double
@@ -91,15 +94,15 @@ class WeatherRepository(context: Context) {
     }
 
     suspend fun insertLocationToFav(location: FavoriteLocation) {
-        localDataSource.insertLocation(location)
+        favLocalDataSource.insertLocation(location)
     }
 
     suspend fun deleteLocationFromFav(location: FavoriteLocation) {
-        localDataSource.deleteLocation(location)
+        favLocalDataSource.deleteLocation(location)
     }
 
     fun getAllFavLocations(): Flow<ResultState<List<FavoriteLocation>>> =
-        localDataSource.getAllLocations()
+        favLocalDataSource.getAllLocations()
             .map { locations -> ResultState.Success(locations) as ResultState<List<FavoriteLocation>> }
             .onStart { emit(ResultState.Loading) }
             .catch { e -> emit(ResultState.Error(e.message ?: "Unknown error")) }
@@ -120,4 +123,18 @@ class WeatherRepository(context: Context) {
         }
 
     }
+
+    suspend fun insertAlert(alert: Alert) {
+        alertLocalDataSource.insertAlert(alert)
+    }
+
+    suspend fun deleteAlert(alert: Alert) {
+        alertLocalDataSource.deleteAlert(alert)
+    }
+
+    fun getAllAlerts(): Flow<ResultState<List<Alert>>> =
+        alertLocalDataSource.getAllAlerts()
+            .map { alerts -> ResultState.Success(alerts) as ResultState<List<Alert>> }
+            .onStart { emit(ResultState.Loading) }
+            .catch { e -> emit(ResultState.Error(e.message ?: "Unknown error")) }
 }
