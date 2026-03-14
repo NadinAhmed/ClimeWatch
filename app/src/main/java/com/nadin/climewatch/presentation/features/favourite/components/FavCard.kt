@@ -3,6 +3,7 @@ package com.nadin.climewatch.presentation.features.favourite.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
@@ -37,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.IconBackgroundColor
+import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryLightColor
 import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 import com.nadin.climewatch.presentation.utils.components.Spacers
 
@@ -67,26 +71,24 @@ fun FavCard(
         enableDismissFromStartToEnd = false,
         backgroundContent = {
             val progress = dismissState.progress
-            val isActive = dismissState.targetValue == SwipeToDismissBoxValue.EndToStart
-                    || progress > 0.05f
+
+            val isActive = dismissState.currentValue == SwipeToDismissBoxValue.Settled
+                    && dismissState.targetValue == SwipeToDismissBoxValue.EndToStart
+                    || (dismissState.currentValue == SwipeToDismissBoxValue.Settled && progress > 0.05f)
 
             val color by animateColorAsState(
-                targetValue = when {
-                    isActive -> Color.Red.copy(alpha = 0.3f)
-                    else -> Color.Transparent
-                },
+                targetValue = if (isActive) Color.Red.copy(alpha = 0.3f) else Color.Transparent,
                 label = "swipe_color"
             )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(color)
-                    .padding(end = 24.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                if (isActive) {
+            if (isActive) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(color)
+                        .padding(end = 24.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
@@ -95,30 +97,28 @@ fun FavCard(
                     )
                 }
             }
-
         }
     ) {
         Card(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(
-                width = 1.dp,
-                brush = AppGradient.buttonLinearGradient
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = LabelLightColor,
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = PrimaryColor.copy(alpha = 0.8f)
             )
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                PrimaryDarkColor.copy(alpha = 0.8f),
-                                PrimaryColor.copy(alpha = 0.6f)
-                            ),
-                            start = Offset(0f, 0f),
-                            end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
-                        )
+                        PrimaryColor.copy(alpha = 0.8f),
+                        shape = RoundedCornerShape(16.dp)
                     )
                     .padding(16.dp)
             ) {
@@ -129,7 +129,10 @@ fun FavCard(
                     Box(
                         modifier = Modifier
                             .size(48.dp)
-                            .background(color = IconBackgroundColor, shape = CircleShape),
+                            .background(
+                                brush = AppGradient.labelLinearGradient,
+                                shape = CircleShape
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
