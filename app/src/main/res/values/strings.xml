@@ -39,4 +39,13 @@
     <string name="alerts_decsription">for timely weather updates</string>
     <string name="favourite_locations">Favorite Locations</string>
     <string name="favourite_locations_decsription">for quick access to weather updates</string>
+    <string name="gps">GPS</string>
+    <string name="use_current_location">Use current location</string>
+    <string name="choose_from_map">Choose from Map</string>
+    <string name="pick_a_location_on_the_map">Pick a location on the map</string>
+    <string name="matric">Metric\n°C, m/s, mm</string>
+    <string name="imperial">Imperial\n°F, mph, in</string>
+    <string name="standard">Standard\n°K, m/s, mm</string>
+    <string name="english">English</string>
+    <string name="arabic">العربية</string>
 </resources>

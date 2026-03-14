@@ -10,12 +10,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -37,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,15 +54,13 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.ktx.model.cameraPosition
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
-import com.nadin.climewatch.data.features.weather.model.City
+import com.nadin.climewatch.data.local.SettingsDataStore
+import com.nadin.climewatch.data.model.City
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.ButtonLightColor
-import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
-import com.nadin.climewatch.presentation.ui.theme.PrimaryLightColor
 import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 import com.nadin.climewatch.presentation.utils.components.Spacers
 import com.nadin.climewatch.presentation.utils.states.ResultState
@@ -71,12 +68,16 @@ import com.nadin.climewatch.presentation.utils.states.ResultState
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LocationPickerMap(
-    navController: NavController
+    navController: NavController,
+    mapSource: MapSource
 ) {
     val context = LocalContext.current
+    val settingsDataStore = remember { SettingsDataStore(context) }
     val viewModel: MapViewModel = viewModel(
         factory = MapViewModelFactory(
-            repository = WeatherRepository(context)
+            repository = WeatherRepository(context, settingsDataStore),
+            settingsDataStore = settingsDataStore,
+            mapSource = MapSource.FromFavorites
         )
     )
 
@@ -226,12 +227,16 @@ fun LocationPickerMap(
                                     }
                                 }
                                 if (city != state.data.last()) {
-                                    HorizontalDivider(color = Color.White.copy(alpha = 0.3f), thickness = 1.dp)
+                                    HorizontalDivider(
+                                        color = Color.White.copy(alpha = 0.3f),
+                                        thickness = 1.dp
+                                    )
                                 }
                             }
                         }
                     }
                 }
+
                 else -> {}
             }
         }

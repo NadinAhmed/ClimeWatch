@@ -1,4 +1,4 @@
-package com.nadin.climewatch.data.features.weather.model
+package com.nadin.climewatch.data.model
 
 data class City(
     val name: String,

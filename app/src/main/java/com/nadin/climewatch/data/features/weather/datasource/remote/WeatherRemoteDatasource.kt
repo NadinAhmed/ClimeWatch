@@ -6,18 +6,24 @@ import com.nadin.climewatch.data.exptions.ServerException
 import com.nadin.climewatch.data.features.weather.dto.WeatherResponseDto
 import com.nadin.climewatch.data.features.weather.dto.ForecastResponseDto
 import com.nadin.climewatch.data.features.weather.dto.CityDto
+import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.data.network.RetrofitInstance
+import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import java.io.IOException
 
 class WeatherRemoteDatasource(
+    private val settingsDataStore: SettingsDataStore
 ) {
+
     suspend fun getWeatherByGeoCode(
         lat: Double,
         lon: Double
     ): WeatherResponseDto {
         return try {
-            RetrofitInstance.weatherService.getWeather(lat, lon)
+            val units = settingsDataStore.units.first()
+            val lang = settingsDataStore.language.first()
+            RetrofitInstance.weatherService.getWeather(lat, lon, units, lang)
         } catch (e: HttpException) {
             throw ServerException()
         } catch (e: IOException) {
@@ -29,7 +35,9 @@ class WeatherRemoteDatasource(
         city: String
     ): WeatherResponseDto {
         return try {
-            RetrofitInstance.weatherService.getWeather(city)
+            val units = settingsDataStore.units.first()
+            val lang = settingsDataStore.language.first()
+            RetrofitInstance.weatherService.getWeather(city, units, lang)
         } catch (e: HttpException) {
             throw ServerException()
         } catch (e: IOException) {
@@ -42,9 +50,9 @@ class WeatherRemoteDatasource(
         lon: Double
     ): ForecastResponseDto {
         return try {
-            RetrofitInstance.weatherService.getForecast(
-                lat, lon
-            )
+            val units = settingsDataStore.units.first()
+            val lang = settingsDataStore.language.first()
+            RetrofitInstance.weatherService.getForecast(lat, lon, units, lang)
         } catch (e: HttpException) {
             throw ServerException()
         } catch (e: IOException) {
@@ -56,7 +64,9 @@ class WeatherRemoteDatasource(
         city: String
     ): ForecastResponseDto {
         return try {
-            RetrofitInstance.weatherService.getForecast(city)
+            val units = settingsDataStore.units.first()
+            val lang = settingsDataStore.language.first()
+            RetrofitInstance.weatherService.getForecast(city, units, lang)
         } catch (e: HttpException) {
             throw ServerException()
         } catch (e: IOException) {
@@ -68,8 +78,14 @@ class WeatherRemoteDatasource(
         geoCode: LatLng
     ): CityDto {
         return try {
+            val units = settingsDataStore.units.first()
+            val lang = settingsDataStore.language.first()
             val response =
-                RetrofitInstance.weatherService.getCityByGeoCode(geoCode.latitude, geoCode.longitude)
+                RetrofitInstance.weatherService.getCityByGeoCode(
+                    geoCode.latitude,
+                    geoCode.longitude,
+                    units = units, lang = lang
+                )
             response.firstOrNull() ?: CityDto(
                 name = "${"%.4f".format(geoCode.latitude)}, ${"%.4f".format(geoCode.longitude)}",
                 lat = geoCode.latitude,
@@ -87,7 +103,9 @@ class WeatherRemoteDatasource(
         query: String
     ): List<CityDto> {
         return try {
-            RetrofitInstance.weatherService.getSuggestionCities(query)
+            val units = settingsDataStore.units.first()
+            val lang = settingsDataStore.language.first()
+            RetrofitInstance.weatherService.getSuggestionCities(query, units = units, lang = lang)
         } catch (e: HttpException) {
             throw ServerException()
         } catch (e: IOException) {

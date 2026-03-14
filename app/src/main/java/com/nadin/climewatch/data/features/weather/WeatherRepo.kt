@@ -10,10 +10,11 @@ import com.nadin.climewatch.data.features.weather.datasource.remote.WeatherRemot
 import com.nadin.climewatch.data.features.weather.dto.toForecast
 import com.nadin.climewatch.data.features.weather.dto.toModel
 import com.nadin.climewatch.data.features.weather.entites.Alert
-import com.nadin.climewatch.data.features.weather.model.City
+import com.nadin.climewatch.data.model.City
 import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
-import com.nadin.climewatch.data.features.weather.model.Forecast
-import com.nadin.climewatch.data.features.weather.model.Weather
+import com.nadin.climewatch.data.local.SettingsDataStore
+import com.nadin.climewatch.data.model.Forecast
+import com.nadin.climewatch.data.model.Weather
 import com.nadin.climewatch.presentation.utils.states.ResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,8 +23,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
 @RequiresApi(Build.VERSION_CODES.O)
-class WeatherRepository(context: Context) {
-    private val remoteDataSource: WeatherRemoteDatasource = WeatherRemoteDatasource()
+class WeatherRepository(context: Context, private val settingsDataStore: SettingsDataStore) {
+    private val remoteDataSource: WeatherRemoteDatasource =
+        WeatherRemoteDatasource(settingsDataStore)
     private val favLocalDataSource: FavLocationLocalDataSource = FavLocationLocalDataSource(context)
     private val alertLocalDataSource: AlertLocalDataSource = AlertLocalDataSource(context)
     suspend fun getWeatherByGeoCode(

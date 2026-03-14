@@ -2,11 +2,7 @@ package com.nadin.climewatch.presentation.features.home
 
 import android.Manifest
 import android.app.Application
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -15,13 +11,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -30,20 +23,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,8 +46,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
-import com.nadin.climewatch.data.features.weather.model.Forecast
-import com.nadin.climewatch.data.features.weather.model.Weather
+import com.nadin.climewatch.data.local.SettingsDataStore
+import com.nadin.climewatch.data.model.Forecast
+import com.nadin.climewatch.data.model.Weather
 import com.nadin.climewatch.presentation.features.home.components.ProprietariesItem
 import com.nadin.climewatch.presentation.features.home.components.TodayForecastItem
 import com.nadin.climewatch.presentation.features.home.components.WeeklyForecastItem
@@ -79,10 +67,12 @@ import com.nadin.climewatch.presentation.utils.components.Spacers
 fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = null) {
 
     val context = LocalContext.current
+    val settingsDataStore = remember { SettingsDataStore(context) }
     val viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(
-            weatherRepository = WeatherRepository(context),
-            app = context.applicationContext as Application
+        factory = HomeViewModel.HomeViewModelFactory(
+            app = context.applicationContext as Application,
+            weatherRepository = WeatherRepository(context, settingsDataStore),
+            settingsDataStore = settingsDataStore
         )
     )
 

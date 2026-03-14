@@ -1,7 +1,7 @@
 package com.nadin.climewatch.data.features.weather.dto
 
 import com.google.gson.annotations.SerializedName
-import com.nadin.climewatch.data.features.weather.model.Weather
+import com.nadin.climewatch.data.model.Weather
 
 data class WeatherResponseDto(
     val weather: List<WeatherDto>,

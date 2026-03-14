@@ -9,20 +9,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.nadin.climewatch.data.features.weather.WeatherRepository
-import com.nadin.climewatch.data.features.weather.model.Forecast
-import com.nadin.climewatch.data.features.weather.model.Weather
+import com.nadin.climewatch.data.model.Forecast
+import com.nadin.climewatch.data.model.Weather
 import com.nadin.climewatch.data.local.CityPreferences
+import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.presentation.utils.Location
 import com.nadin.climewatch.presentation.utils.states.LocationSource
 import com.nadin.climewatch.presentation.utils.states.ResultState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 class HomeViewModel(
+    private val app: Application,
     private val repository: WeatherRepository,
-    private val app: Application
+    private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
 
     private val _weatherState = MutableStateFlow<ResultState<Weather>>(ResultState.Loading)
@@ -33,11 +36,34 @@ class HomeViewModel(
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
 
+    init {
+        observeSettings()
+    }
+
+    private fun observeSettings() {
+        viewModelScope.launch {
+            combine(
+                settingsDataStore.locationMode,
+                settingsDataStore.selectedLat,
+                settingsDataStore.selectedLon,
+            ) { mode, lat, lon ->
+                Triple(mode, lat, lon)
+            }.collect { (mode, lat, lon) ->
+                when (mode) {
+                    "gps" -> loadWeatherForCurrentLocation()
+                    "map" -> loadWeatherForSpecificLocation(lat, lon)
+                }
+            }
+        }
+    }
+
+
     fun loadWeatherForCurrentLocation() {
         viewModelScope.launch {
             fetchDataBySource(LocationSource.CurrentLocation)
         }
     }
+
     fun loadWeatherForSpecificLocation(cityName: String) {
         viewModelScope.launch {
             fetchDataBySource(LocationSource.SpecificLocationWithCity(cityName))
@@ -49,6 +75,7 @@ class HomeViewModel(
             fetchDataBySource(LocationSource.SpecificLocationWithGeoCode(lat, lon))
         }
     }
+
     @SuppressLint("MissingPermission")
     private suspend fun fetchDataBySource(source: LocationSource) {
         _weatherState.value = ResultState.Loading
@@ -60,6 +87,7 @@ class HomeViewModel(
                     val location = Location.getCurrentLocation(fusedLocationClient)
                     fetchWeatherAndForecast(location.latitude, location.longitude)
                 }
+
                 is LocationSource.SpecificLocationWithCity -> {
                     fetchWeatherAndForecastByCity(source.cityName)
                 }
@@ -98,18 +126,20 @@ class HomeViewModel(
         repository.getForecastByCity(cityName)
             .collect { _forecastState.value = it }
     }
-}
 
-@RequiresApi(Build.VERSION_CODES.O)
-class HomeViewModelFactory(
-    private val weatherRepository: WeatherRepository,
-    private val app: Application
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(weatherRepository, app) as T
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    class HomeViewModelFactory(
+        private val app: Application,
+        private val weatherRepository: WeatherRepository,
+        private val settingsDataStore: SettingsDataStore
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return HomeViewModel(app, weatherRepository, settingsDataStore) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

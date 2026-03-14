@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
+import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.presentation.features.favourite.components.FavCard
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.utils.NavigationRoutes
@@ -51,9 +53,10 @@ import com.nadin.climewatch.presentation.utils.states.ResultState
 fun FavScreen(navController: NavController) {
 
     val context = LocalContext.current
+    val settingsDataStore = remember { SettingsDataStore(context) }
     val viewModel: FavViewModel = viewModel(
         factory = FavViewModelFactory(
-            repository = WeatherRepository(context)
+            repository = WeatherRepository(context, settingsDataStore)
         )
     )
 
@@ -63,7 +66,7 @@ fun FavScreen(navController: NavController) {
         viewModel.favEvent.collect { event ->
             when (event) {
                 is FavEvent.GoToMap -> {
-                    navController.navigate(NavigationRoutes.MapPicker.route)
+                    navController.navigate(NavigationRoutes.MapPicker.fromFav())
                 }
 
                 is FavEvent.GoToHome -> {

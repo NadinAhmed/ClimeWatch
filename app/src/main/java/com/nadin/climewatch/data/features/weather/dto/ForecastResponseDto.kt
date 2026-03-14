@@ -2,9 +2,9 @@ package com.nadin.climewatch.data.features.weather.dto
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.nadin.climewatch.data.features.weather.model.DailyForecast
-import com.nadin.climewatch.data.features.weather.model.Forecast
-import com.nadin.climewatch.data.features.weather.model.HourlyForecast
+import com.nadin.climewatch.data.model.DailyForecast
+import com.nadin.climewatch.data.model.Forecast
+import com.nadin.climewatch.data.model.HourlyForecast
 import com.nadin.climewatch.presentation.utils.Date
 
 data class ForecastResponseDto(

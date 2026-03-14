@@ -44,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nadin.climewatch.R
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.local.CityPreferences
+import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.presentation.features.alert.components.AddAlertBottomSheet
 import com.nadin.climewatch.presentation.features.alert.components.AlertItem
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
@@ -57,10 +58,11 @@ import com.nadin.climewatch.presentation.utils.states.ResultState
 fun AlertScreen() {
 
     val context = LocalContext.current
+    val settingsDataStore = remember { SettingsDataStore(context) }
     val viewModel: AlertViewModel = viewModel(
         factory = AlertViewModelFactory(
             context.applicationContext,
-            repository = WeatherRepository(context)
+            repository = WeatherRepository(context, settingsDataStore)
         )
     )
 

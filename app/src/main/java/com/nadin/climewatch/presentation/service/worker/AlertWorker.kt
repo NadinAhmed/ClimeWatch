@@ -12,7 +12,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.entites.AlertType
-import com.nadin.climewatch.data.features.weather.model.Weather
+import com.nadin.climewatch.data.local.SettingsDataStore
+import com.nadin.climewatch.data.model.Weather
 import com.nadin.climewatch.presentation.service.AlarmService
 import com.nadin.climewatch.presentation.service.notification.NotificationHelper
 
@@ -47,7 +48,8 @@ class AlertWorker(
         }
 
         return try {
-            val weatherData = WeatherRepository(context).getWeatherByCity(city)
+            val settingsDataStore = SettingsDataStore(context)
+            val weatherData = WeatherRepository(context, settingsDataStore).getWeatherByCity(city)
             if (weatherData.isSuccess) {
                 val weather = weatherData.getOrNull()
                 if (weather != null) {

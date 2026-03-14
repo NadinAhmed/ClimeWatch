@@ -1,5 +1,6 @@
 package com.nadin.climewatch
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -46,14 +47,16 @@ import com.nadin.climewatch.presentation.features.alert.AlertScreen
 import com.nadin.climewatch.presentation.features.favourite.FavScreen
 import com.nadin.climewatch.presentation.features.maps.LocationPickerMap
 import com.nadin.climewatch.presentation.features.home.HomeScreen
+import com.nadin.climewatch.presentation.features.maps.MapSource
 import com.nadin.climewatch.presentation.features.settings.SettingsScreen
 import com.nadin.climewatch.presentation.ui.theme.ClimeWatchTheme
 import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
+import com.nadin.climewatch.presentation.utils.BaseActivity
 import com.nadin.climewatch.presentation.utils.BottomNavItem
 import com.nadin.climewatch.presentation.utils.NavigationRoutes
 
 @RequiresApi(Build.VERSION_CODES.O)
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -62,6 +65,15 @@ class MainActivity : ComponentActivity() {
                 MainScreen()
             }
         }
+    }
+
+    fun restartActivity() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        startActivity(intent)
+        finish()
     }
 }
 
@@ -188,10 +200,35 @@ fun MainScreen() {
                 val lon = backStackEntry.arguments?.getString("lon")?.toDoubleOrNull()
                 HomeScreen(lat = lat, lon = lon)
             }
-            composable(NavigationRoutes.Favourite.route) {FavScreen(navController)}
+            composable(NavigationRoutes.Favourite.route) { FavScreen(navController) }
             composable(NavigationRoutes.Alerts.route) { AlertScreen() }
-            composable(NavigationRoutes.Settings.route) { SettingsScreen() }
-            composable(NavigationRoutes.MapPicker.route) {LocationPickerMap(navController)}
+            composable(NavigationRoutes.Settings.route) {
+                SettingsScreen(
+                    onOpenMapPicker = {
+                        navController.navigate(NavigationRoutes.MapPicker.fromSettings())
+                    }
+                )
+            }
+            composable(
+                route = NavigationRoutes.MapPicker.route,
+                arguments = listOf(
+                    navArgument("source") {
+                        type = NavType.StringType
+                        defaultValue = "fav"
+                    }
+                )
+            ) { backStackEntry ->
+                val sourceArg = backStackEntry.arguments?.getString("source")
+                val source = if (sourceArg == "settings")
+                    MapSource.FromSettings
+                else
+                    MapSource.FromFavorites
+
+                LocationPickerMap(
+                    navController = navController,
+                    mapSource = source
+                )
+            }
         }
     }
 }

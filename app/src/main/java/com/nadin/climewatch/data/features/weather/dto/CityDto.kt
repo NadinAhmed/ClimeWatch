@@ -1,6 +1,6 @@
 package com.nadin.climewatch.data.features.weather.dto
 
-import com.nadin.climewatch.data.features.weather.model.City
+import com.nadin.climewatch.data.model.City
 
 data class CityDto(
     val name: String,

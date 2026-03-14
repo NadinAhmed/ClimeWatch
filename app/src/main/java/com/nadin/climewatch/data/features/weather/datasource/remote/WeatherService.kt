@@ -12,12 +12,14 @@ interface WeatherService{
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "en",
     ): WeatherResponseDto
 
     @GET("data/2.5/weather")
     suspend fun getWeather(
         @Query("q") city: String,
         @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "en",
     ): WeatherResponseDto
 
     @GET("data/2.5/forecast")
@@ -25,24 +27,30 @@ interface WeatherService{
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "en",
     ): ForecastResponseDto
 
     @GET("data/2.5/forecast")
     suspend fun getForecast(
         @Query("q") city: String,
         @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "en",
     ): ForecastResponseDto
 
     @GET("geo/1.0/reverse")
     suspend fun getCityByGeoCode(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
-        @Query("limit") limit: Int = 1
+        @Query("limit") limit: Int = 1,
+        @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "en",
     ): List<CityDto>
 
     @GET("geo/1.0/direct")
     suspend fun getSuggestionCities(
         @Query("q") query: String,
-        @Query("limit") limit: Int = 10
+        @Query("limit") limit: Int = 10,
+        @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "en",
     ): List<CityDto>
 }

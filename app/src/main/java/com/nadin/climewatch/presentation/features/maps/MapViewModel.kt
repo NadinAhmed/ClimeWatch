@@ -7,8 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.nadin.climewatch.data.features.weather.WeatherRepository
-import com.nadin.climewatch.data.features.weather.model.City
+import com.nadin.climewatch.data.model.City
 import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
+import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.presentation.utils.states.ResultState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
-class MapViewModel(private val repository: WeatherRepository) : ViewModel() {
+class MapViewModel(
+    private val repository: WeatherRepository,
+    private val settingsDataStore: SettingsDataStore,
+    private val mapSource: MapSource
+) : ViewModel() {
     private val _selectedLocation = MutableStateFlow<LatLng?>(null)
     val selectedLocation = _selectedLocation.asStateFlow()
 
@@ -111,14 +116,26 @@ class MapViewModel(private val repository: WeatherRepository) : ViewModel() {
         if (cityResult is ResultState.Success) {
             val city = cityResult.data
             viewModelScope.launch {
-                repository.insertLocationToFav(
-                    FavoriteLocation(
-                        city = city.name,
-                        country = city.country,
-                        lat = location.latitude,
-                        lon = location.longitude
-                    )
-                )
+                when (mapSource) {
+                    is MapSource.FromFavorites -> {
+                        repository.insertLocationToFav(
+                            FavoriteLocation(
+                                city = city.name,
+                                country = city.country,
+                                lat = location.latitude,
+                                lon = location.longitude
+                            )
+                        )
+                    }
+
+                    is MapSource.FromSettings -> {
+                        settingsDataStore.saveLocationMode("map")
+                        settingsDataStore.saveSelectedLocation(
+                            location.latitude,
+                            location.longitude
+                        )
+                    }
+                }
                 _mapEvent.emit(MapEvent.GoBackToFav)
             }
         }
@@ -127,12 +144,14 @@ class MapViewModel(private val repository: WeatherRepository) : ViewModel() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MapViewModelFactory(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val settingsDataStore: SettingsDataStore,
+    private val mapSource: MapSource,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository) as T
+            return MapViewModel(repository, settingsDataStore, mapSource) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

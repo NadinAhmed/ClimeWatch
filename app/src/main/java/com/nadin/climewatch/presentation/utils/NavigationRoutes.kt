@@ -8,5 +8,8 @@ sealed class NavigationRoutes(val route: String) {
     object Favourite : NavigationRoutes("favourite")
     object Alerts : NavigationRoutes("alerts")
     object Settings : NavigationRoutes("settings")
-    object MapPicker : NavigationRoutes("map_picker")
+    object MapPicker : NavigationRoutes("map_picker/{source}") {
+        fun fromFav()      = "map_picker/fav"
+        fun fromSettings() = "map_picker/settings"
+    }
 }
