@@ -13,17 +13,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 
 @Composable
-fun ProprietariesItem (@DrawableRes iconRes: Int ,data: Int ,label: String) {
+fun ProprietariesItem(@DrawableRes iconRes: Int, data: String, label: String) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(60.dp)
+        modifier = Modifier.width(75.dp)
     ) {
         Image(
             painter = painterResource(iconRes),
@@ -32,7 +30,7 @@ fun ProprietariesItem (@DrawableRes iconRes: Int ,data: Int ,label: String) {
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "$data",
+            text = data,
             style = MaterialTheme.typography.titleMedium
         )
         Text(

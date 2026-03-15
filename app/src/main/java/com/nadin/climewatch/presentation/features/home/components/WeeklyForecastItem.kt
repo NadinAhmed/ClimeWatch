@@ -27,7 +27,7 @@ import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
 fun WeeklyForecastItem(
     day: String,
     weatherDescription: String,
-    temperature: Double,
+    temperatureLabel: String,
     weatherIconRes: Int
 ) {
     Box(
@@ -74,7 +74,7 @@ fun WeeklyForecastItem(
             }
 
             Text(
-                text = "${temperature.toInt()}°",
+                text = temperatureLabel,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp

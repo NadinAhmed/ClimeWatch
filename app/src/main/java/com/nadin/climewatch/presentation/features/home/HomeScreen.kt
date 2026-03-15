@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import java.util.Locale
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -61,6 +62,7 @@ import com.nadin.climewatch.presentation.utils.states.ResultState
 import com.nadin.climewatch.presentation.utils.components.ErrorScreen
 import com.nadin.climewatch.presentation.utils.components.LoadingScreen
 import com.nadin.climewatch.presentation.utils.components.Spacers
+import kotlin.math.abs
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -79,6 +81,7 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
     val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
     val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
     val locationMode by viewModel.locationModeState.collectAsStateWithLifecycle()
+    val units by viewModel.unitsState.collectAsStateWithLifecycle()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -130,13 +133,14 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    HomeContent(weatherState, forecastState)
+    HomeContent(weatherState, forecastState, units)
 }
 
 @Composable
 fun HomeContent(
     weatherState: ResultState<Weather>,
     forecastState: ResultState<Forecast>,
+    units: String,
     modifier: Modifier = Modifier
 ) {
     when {
@@ -156,6 +160,7 @@ fun HomeContent(
             HomeSuccessContent(
                 weather = weatherState.data,
                 forecast = forecastState.data,
+                units = units,
                 modifier = modifier
             )
         }
@@ -166,8 +171,14 @@ fun HomeContent(
 private fun HomeSuccessContent(
     weather: Weather,
     forecast: Forecast,
+    units: String,
     modifier: Modifier = Modifier
 ) {
+    val primaryTemperature = formatTemperature(weather.temperature, units)
+    val pressureDisplay = formatPressure(weather.pressure)
+    val humidityDisplay = formatHumidity(weather.humidity)
+    val windDisplay = formatWindSpeed(weather.windSpeed, units)
+
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(16.dp),
@@ -176,34 +187,6 @@ private fun HomeSuccessContent(
             .systemBarsPadding()
     ) {
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = {},
-                    modifier = Modifier
-                        .size(35.dp)
-                        .background(
-                            Color.White.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = LabelLightColor,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refresh",
-                        tint = Color.White,
-                    )
-                }
-            }
-            Spacers.VerticalSpacer(25.dp)
             Text(
                 "${weather.city}, ${weather.country}",
                 style = MaterialTheme.typography.bodySmall,
@@ -218,7 +201,7 @@ private fun HomeSuccessContent(
             )
             Spacers.VerticalSpacer(28.dp)
             Text(
-                "${weather.temperature} °",
+                primaryTemperature,
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -252,17 +235,17 @@ private fun HomeSuccessContent(
                 ) {
                     ProprietariesItem(
                         iconRes = R.drawable.pressure_icon,
-                        data = weather.pressure,
+                        data = pressureDisplay,
                         label = stringResource(R.string.pressure)
                     )
                     ProprietariesItem(
                         iconRes = R.drawable.humaditiy_icon,
-                        data = weather.humidity,
+                        data = humidityDisplay,
                         label = stringResource(R.string.humidity)
                     )
                     ProprietariesItem(
                         iconRes = R.drawable.wind_icon,
-                        data = weather.windSpeed.toInt(),
+                        data = windDisplay,
                         label = stringResource(R.string.wind_speed)
                     )
                 }
@@ -281,7 +264,7 @@ private fun HomeSuccessContent(
                     val hourly = forecast.hourly[index]
                     TodayForecastItem(
                         hour = hourly.time,
-                        temperature = hourly.temperature,
+                        temperatureLabel = formatTemperature(hourly.temperature, units),
                         weatherIconRes = getWeatherIcon(hourly.icon)
                     )
                 }
@@ -299,10 +282,40 @@ private fun HomeSuccessContent(
             WeeklyForecastItem(
                 day = daily.day,
                 weatherDescription = daily.description,
-                temperature = daily.temperature,
+                temperatureLabel = formatTemperature(daily.temperature, units),
                 weatherIconRes = getWeatherIcon(daily.icon)
             )
             Spacers.VerticalSpacer(8.dp)
         }
+    }
+}
+
+private fun formatTemperature(value: Double, units: String): String {
+    val symbol = when (units) {
+        "imperial" -> "F°"
+        "standard" -> "K"
+        else -> "C°"
+    }
+    return "${value.clean()}$symbol"
+}
+
+private fun formatWindSpeed(value: Double, units: String): String {
+    val unitLabel = when (units) {
+        "imperial" -> "mph"
+        else -> "m/s"
+    }
+    return "${value.clean()} $unitLabel"
+}
+
+private fun formatPressure(value: Int): String = "$value hPa"
+
+private fun formatHumidity(value: Int): String = "$value%"
+
+private fun Double.clean(decimals: Int = 1): String {
+    val roundedInt = toInt()
+    return if (abs(this - roundedInt.toDouble()) < 0.05) {
+        roundedInt.toString()
+    } else {
+        String.format(Locale.getDefault(), "%.${decimals}f", this)
     }
 }

@@ -22,12 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
-import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 
 @Composable
-fun TodayForecastItem(hour: String, temperature: Double, weatherIconRes: Int) {
+fun TodayForecastItem(hour: String, temperatureLabel: String, weatherIconRes: Int) {
     Box(
         modifier = Modifier
             .width(80.dp)
@@ -59,7 +57,7 @@ fun TodayForecastItem(hour: String, temperature: Double, weatherIconRes: Int) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "$temperature °",
+                temperatureLabel,
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp)
             )
         }

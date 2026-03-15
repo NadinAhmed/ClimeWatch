@@ -33,6 +33,8 @@ class HomeViewModel(
     private var latestMode: String = "gps"
     private var latestLat: Double = 0.0
     private var latestLon: Double = 0.0
+    private val _unitsState = MutableStateFlow("metric")
+    val unitsState = _unitsState.asStateFlow()
 
     private val _weatherState = MutableStateFlow<ResultState<Weather>>(ResultState.Loading)
     val weatherState = _weatherState.asStateFlow()
@@ -52,14 +54,16 @@ class HomeViewModel(
                 settingsDataStore.locationMode,
                 settingsDataStore.selectedLat,
                 settingsDataStore.selectedLon,
-            ) { mode, lat, lon ->
-                Triple(mode, lat, lon)
-            }.collect { (mode, lat, lon) ->
-                latestMode = mode
-                latestLat = lat
-                latestLon = lon
-                _locationModeState.value = mode
-                requestWeatherForMode(mode, lat, lon)
+                settingsDataStore.units
+            ) { mode, lat, lon, units ->
+                HomeSettingsSnapshot(mode, lat, lon, units)
+            }.collect { snapshot ->
+                latestMode = snapshot.mode
+                latestLat = snapshot.lat
+                latestLon = snapshot.lon
+                _locationModeState.value = snapshot.mode
+                _unitsState.value = snapshot.units
+                requestWeatherForMode(snapshot.mode, snapshot.lat, snapshot.lon)
             }
         }
     }
@@ -164,3 +168,10 @@ class HomeViewModel(
         }
     }
 }
+
+private data class HomeSettingsSnapshot(
+    val mode: String,
+    val lat: Double,
+    val lon: Double,
+    val units: String
+)
