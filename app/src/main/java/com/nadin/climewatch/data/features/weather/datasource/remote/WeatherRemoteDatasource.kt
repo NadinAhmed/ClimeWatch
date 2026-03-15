@@ -14,9 +14,9 @@ import java.io.IOException
 
 class WeatherRemoteDatasource(
     private val settingsDataStore: SettingsDataStore
-) {
+) : IWeatherRemoteDatasource {
 
-    suspend fun getWeatherByGeoCode(
+    override suspend fun getWeatherByGeoCode(
         lat: Double,
         lon: Double
     ): WeatherResponseDto {
@@ -31,7 +31,7 @@ class WeatherRemoteDatasource(
         }
     }
 
-    suspend fun getWeatherByCity(
+    override suspend fun getWeatherByCity(
         city: String
     ): WeatherResponseDto {
         return try {
@@ -45,7 +45,7 @@ class WeatherRemoteDatasource(
         }
     }
 
-    suspend fun getForecastByGeoCode(
+    override suspend fun getForecastByGeoCode(
         lat: Double,
         lon: Double
     ): ForecastResponseDto {
@@ -60,7 +60,7 @@ class WeatherRemoteDatasource(
         }
     }
 
-    suspend fun getForecastByCity(
+    override suspend fun getForecastByCity(
         city: String
     ): ForecastResponseDto {
         return try {
@@ -74,7 +74,7 @@ class WeatherRemoteDatasource(
         }
     }
 
-    suspend fun getCityByGeoCode(
+    override suspend fun getCityByGeoCode(
         geoCode: LatLng
     ): CityDto {
         return try {
@@ -99,7 +99,7 @@ class WeatherRemoteDatasource(
         }
     }
 
-    suspend fun getSuggestionCities(
+    override suspend fun getSuggestionCities(
         query: String
     ): List<CityDto> {
         return try {

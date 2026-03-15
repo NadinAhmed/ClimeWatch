@@ -119,6 +119,31 @@ dependencies {
     implementation("io.coil-kt:coil-svg:2.6.0")
 
     // DataStore
-    //noinspection GradleDependency
     implementation(libs.androidx.datastore.preferences)
+
+    // Dependencies for local unit tests
+    testImplementation ("junit:junit:4.13.2")
+
+    // AndroidX Test - Instrumented testing
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
+    // Kotlin
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.23")
+    implementation ("androidx.fragment:fragment-ktx:1.7.1")
+
+    testImplementation ("org.hamcrest:hamcrest:3.0")
+    testImplementation ("org.hamcrest:hamcrest-library:3.0")
+
+    testImplementation ("androidx.test:core-ktx:1.7.0")
+    testImplementation ("org.robolectric:robolectric:4.16.1")
+    testImplementation ("androidx.test.ext:junit-ktx:1.3.0")
+
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+
+    testImplementation ("io.mockk:mockk-android:1.13.17")
+    testImplementation ("io.mockk:mockk-agent:1.13.17")
+
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 }

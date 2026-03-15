@@ -22,10 +22,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -77,7 +73,7 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModel.HomeViewModelFactory(
             app = context.applicationContext as Application,
-            weatherRepository = WeatherRepository(context, settingsDataStore),
+            weatherRepository = WeatherRepository.getInstance(context),
             settingsDataStore = settingsDataStore
         )
     )

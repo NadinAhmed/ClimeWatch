@@ -49,7 +49,7 @@ class AlertWorker(
 
         return try {
             val settingsDataStore = SettingsDataStore(context)
-            val weatherData = WeatherRepository(context, settingsDataStore).getWeatherByCity(city)
+            val weatherData = WeatherRepository.getInstance(context).getWeatherByCity(city)
             if (weatherData.isSuccess) {
                 val weather = weatherData.getOrNull()
                 if (weather != null) {

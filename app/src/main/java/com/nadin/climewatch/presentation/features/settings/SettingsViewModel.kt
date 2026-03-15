@@ -3,6 +3,7 @@ package com.nadin.climewatch.presentation.features.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.nadin.climewatch.data.local.ISettingsDataStore
 import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.data.model.AppLanguage
 import com.nadin.climewatch.data.model.LocationMode
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: ISettingsDataStore
 ) : ViewModel() {
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()

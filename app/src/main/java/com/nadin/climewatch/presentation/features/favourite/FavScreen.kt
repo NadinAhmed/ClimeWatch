@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,7 +43,6 @@ import com.nadin.climewatch.presentation.utils.NavigationRoutes
 import com.nadin.climewatch.presentation.utils.components.EmptyScreen
 import com.nadin.climewatch.presentation.utils.components.ErrorScreen
 import com.nadin.climewatch.presentation.utils.components.LoadingScreen
-import com.nadin.climewatch.presentation.utils.components.Spacers
 import com.nadin.climewatch.presentation.utils.states.ResultState
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -56,7 +53,7 @@ fun FavScreen(navController: NavController) {
     val settingsDataStore = remember { SettingsDataStore(context) }
     val viewModel: FavViewModel = viewModel(
         factory = FavViewModelFactory(
-            repository = WeatherRepository(context, settingsDataStore)
+            repository = WeatherRepository.getInstance(context)
         )
     )
 

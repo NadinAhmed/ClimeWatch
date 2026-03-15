@@ -1,19 +1,19 @@
-package com.nadin.climewatch.data.features.weather.datasource.local
+package com.nadin.climewatch.data.features.weather.datasource.local.alert
 
 import android.content.Context
 import com.nadin.climewatch.data.db.AppDatabase
 import com.nadin.climewatch.data.features.weather.entites.Alert
 
-class AlertLocalDataSource(context: Context) {
+class AlertLocalDataSource(context: Context): IAlertLocalDataSource {
     private val alertDao: AlertDao = AppDatabase.getInstance(context).alertDao()
 
-    suspend fun insertAlert(alert: Alert): Int {
+    override suspend fun insertAlert(alert: Alert): Int {
         return alertDao.insertAlert(alert).toInt()
     }
 
-    suspend fun deleteAlert(alert: Alert) {
+    override suspend fun deleteAlert(alert: Alert) {
         alertDao.deleteAlert(alert)
     }
 
-    fun getAllAlerts() = alertDao.getAllAlerts()
+    override fun getAllAlerts() = alertDao.getAllAlerts()
 }

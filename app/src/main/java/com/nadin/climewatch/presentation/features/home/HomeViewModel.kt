@@ -8,10 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
+import com.nadin.climewatch.data.features.weather.IWeatherRepo
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.model.Forecast
 import com.nadin.climewatch.data.model.Weather
 import com.nadin.climewatch.data.local.CityPreferences
+import com.nadin.climewatch.data.local.ISettingsDataStore
 import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.presentation.utils.Location
 import com.nadin.climewatch.presentation.utils.states.LocationSource
@@ -24,8 +26,8 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 class HomeViewModel(
     private val app: Application,
-    private val repository: WeatherRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val repository: IWeatherRepo,
+    private val settingsDataStore: ISettingsDataStore
 ) : ViewModel() {
     private val _locationModeState = MutableStateFlow("gps")
     val locationModeState = _locationModeState.asStateFlow()

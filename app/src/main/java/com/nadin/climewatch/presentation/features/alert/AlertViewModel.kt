@@ -10,6 +10,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.nadin.climewatch.data.features.weather.IWeatherRepo
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.entites.Alert
 import com.nadin.climewatch.presentation.service.worker.AlertWorker
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
 class AlertViewModel(
-    private val repository: WeatherRepository,
+    private val repository: IWeatherRepo,
     private val workManager: WorkManager,
 ) : ViewModel() {
 

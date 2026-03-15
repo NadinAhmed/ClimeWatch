@@ -4,8 +4,11 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.android.gms.maps.model.LatLng
-import com.nadin.climewatch.data.features.weather.datasource.local.AlertLocalDataSource
-import com.nadin.climewatch.data.features.weather.datasource.local.FavLocationLocalDataSource
+import com.nadin.climewatch.data.features.weather.datasource.local.alert.AlertLocalDataSource
+import com.nadin.climewatch.data.features.weather.datasource.local.alert.IAlertLocalDataSource
+import com.nadin.climewatch.data.features.weather.datasource.local.favlocations.FavLocationLocalDataSource
+import com.nadin.climewatch.data.features.weather.datasource.local.favlocations.IFavLocationLocalDataSource
+import com.nadin.climewatch.data.features.weather.datasource.remote.IWeatherRemoteDatasource
 import com.nadin.climewatch.data.features.weather.datasource.remote.WeatherRemoteDatasource
 import com.nadin.climewatch.data.features.weather.dto.toForecast
 import com.nadin.climewatch.data.features.weather.dto.toModel
@@ -23,14 +26,30 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
 @RequiresApi(Build.VERSION_CODES.O)
-class WeatherRepository(context: Context, private val settingsDataStore: SettingsDataStore) {
-    private val remoteDataSource: WeatherRemoteDatasource =
-        WeatherRemoteDatasource(settingsDataStore)
-    private val favLocalDataSource: FavLocationLocalDataSource = FavLocationLocalDataSource(context)
-    private val alertLocalDataSource: AlertLocalDataSource = AlertLocalDataSource(context)
-    suspend fun getWeatherByGeoCode(
-        lat: Double,
-        lon: Double
+class WeatherRepository(
+    private val remoteDataSource: IWeatherRemoteDatasource,
+    private val favLocalDataSource: IFavLocationLocalDataSource,
+    private val alertLocalDataSource: IAlertLocalDataSource
+): IWeatherRepo {
+
+    companion object {
+        private var INSTANCE: WeatherRepository? = null
+        fun getInstance(context: Context): WeatherRepository {
+            if (INSTANCE == null) {
+                val remoteDataSource = WeatherRemoteDatasource(SettingsDataStore(context))
+                val favLocalDataSource = FavLocationLocalDataSource(
+                    context
+                )
+                val alertLocalDataSource = AlertLocalDataSource(context)
+                INSTANCE =
+                    WeatherRepository(remoteDataSource, favLocalDataSource, alertLocalDataSource)
+            }
+            return INSTANCE!!
+        }
+    }
+
+    override suspend fun getWeatherByGeoCode(
+        lat: Double, lon: Double
     ): Result<Weather> {
         return try {
             val dto = remoteDataSource.getWeatherByGeoCode(lat, lon)
@@ -42,7 +61,7 @@ class WeatherRepository(context: Context, private val settingsDataStore: Setting
         }
     }
 
-    suspend fun getWeatherByCity(
+    override suspend fun getWeatherByCity(
         city: String
     ): Result<Weather> {
         return try {
@@ -55,9 +74,8 @@ class WeatherRepository(context: Context, private val settingsDataStore: Setting
         }
     }
 
-    fun getForecastByGeoCode(
-        lat: Double,
-        lon: Double
+    override fun getForecastByGeoCode(
+        lat: Double, lon: Double
     ): Flow<ResultState<Forecast>> = flow {
 
         emit(ResultState.Loading)
@@ -69,7 +87,7 @@ class WeatherRepository(context: Context, private val settingsDataStore: Setting
         }
     }
 
-    fun getForecastByCity(
+    override fun getForecastByCity(
         city: String
     ): Flow<ResultState<Forecast>> = flow {
 
@@ -82,7 +100,7 @@ class WeatherRepository(context: Context, private val settingsDataStore: Setting
         }
     }
 
-    suspend fun getCityByGeoCode(
+    override suspend fun getCityByGeoCode(
         geoCode: LatLng
     ): Result<City> {
         return try {
@@ -95,22 +113,22 @@ class WeatherRepository(context: Context, private val settingsDataStore: Setting
         }
     }
 
-    suspend fun insertLocationToFav(location: FavoriteLocation) {
+    override suspend fun insertLocationToFav(location: FavoriteLocation) {
         favLocalDataSource.insertLocation(location)
     }
 
-    suspend fun deleteLocationFromFav(location: FavoriteLocation) {
+    override suspend fun deleteLocationFromFav(location: FavoriteLocation) {
         favLocalDataSource.deleteLocation(location)
     }
 
-    fun getAllFavLocations(): Flow<ResultState<List<FavoriteLocation>>> =
+    override fun getAllFavLocations(): Flow<ResultState<List<FavoriteLocation>>> =
         favLocalDataSource.getAllLocations()
             .map { locations -> ResultState.Success(locations) as ResultState<List<FavoriteLocation>> }
             .onStart { emit(ResultState.Loading) }
             .catch { e -> emit(ResultState.Error(e.message ?: "Unknown error")) }
 
 
-    fun getSuggestionCities(query: String): Flow<ResultState<List<City>>> = flow {
+    override fun getSuggestionCities(query: String): Flow<ResultState<List<City>>> = flow {
         if (query.length < 2) {
             emit(ResultState.Success(emptyList()))
             return@flow
@@ -126,17 +144,16 @@ class WeatherRepository(context: Context, private val settingsDataStore: Setting
 
     }
 
-    suspend fun insertAlert(alert: Alert): Int {
+    override suspend fun insertAlert(alert: Alert): Int {
         return alertLocalDataSource.insertAlert(alert)
     }
 
-    suspend fun deleteAlert(alert: Alert) {
+    override suspend fun deleteAlert(alert: Alert) {
         alertLocalDataSource.deleteAlert(alert)
     }
 
-    fun getAllAlerts(): Flow<ResultState<List<Alert>>> =
-        alertLocalDataSource.getAllAlerts()
-            .map { alerts -> ResultState.Success(alerts) as ResultState<List<Alert>> }
-            .onStart { emit(ResultState.Loading) }
-            .catch { e -> emit(ResultState.Error(e.message ?: "Unknown error")) }
+    override fun getAllAlerts(): Flow<ResultState<List<Alert>>> = alertLocalDataSource.getAllAlerts()
+        .map { alerts -> ResultState.Success(alerts) as ResultState<List<Alert>> }
+        .onStart { emit(ResultState.Loading) }
+        .catch { e -> emit(ResultState.Error(e.message ?: "Unknown error")) }
 }

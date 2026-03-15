@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.nadin.climewatch.data.features.weather.IWeatherRepo
 import com.nadin.climewatch.data.features.weather.WeatherRepository
 import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 import com.nadin.climewatch.presentation.utils.states.ResultState
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-class FavViewModel(private val repository: WeatherRepository) : ViewModel() {
+class FavViewModel(private val repository: IWeatherRepo) : ViewModel() {
 
     val favorites: StateFlow<ResultState<List<FavoriteLocation>>> = repository.getAllFavLocations()
         .stateIn(

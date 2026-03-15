@@ -1,4 +1,4 @@
-package com.nadin.climewatch.data.features.weather.datasource.local
+package com.nadin.climewatch.data.features.weather.datasource.local.alert
 
 import androidx.room.Dao
 import androidx.room.Delete

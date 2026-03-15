@@ -77,7 +77,7 @@ fun LocationPickerMap(
     val settingsDataStore = remember { SettingsDataStore(context) }
     val viewModel: MapViewModel = viewModel(
         factory = MapViewModelFactory(
-            repository = WeatherRepository(context, settingsDataStore),
+            repository = WeatherRepository.getInstance(context),
             settingsDataStore = settingsDataStore,
             mapSource = mapSource
         )

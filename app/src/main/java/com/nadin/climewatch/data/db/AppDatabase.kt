@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.nadin.climewatch.data.features.weather.datasource.local.AlertDao
-import com.nadin.climewatch.data.features.weather.datasource.local.FavLocationDao
+import com.nadin.climewatch.data.features.weather.datasource.local.alert.AlertDao
+import com.nadin.climewatch.data.features.weather.datasource.local.favlocations.FavLocationDao
 import com.nadin.climewatch.data.features.weather.entites.Alert
 import com.nadin.climewatch.data.features.weather.entites.FavoriteLocation
 

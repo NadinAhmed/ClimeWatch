@@ -53,9 +53,9 @@
     <string name="c_m_s_mm">°C, m/s, mm</string>
     <string name="f_mph_in">°F, mph, in</string>
     <string name="k_m_s_mm">°K, m/s, mm</string>
-    <string name="c">C°</string>
+    <string name="c">°C</string>
     <string name="k">K</string>
-    <string name="f">F°</string>
+    <string name="f">°F</string>
     <string name="mph">mph</string>
     <string name="m_s">m/s</string>
     <string name="hpa">" hPa"</string>

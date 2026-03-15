@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "weather_settings")
 
-class SettingsDataStore(private val context: Context) {
+class SettingsDataStore(private val context: Context): ISettingsDataStore {
     companion object {
         // Keys
         val LOCATION_MODE_KEY = stringPreferencesKey("location_mode")   // "gps" | "map"
@@ -23,21 +23,21 @@ class SettingsDataStore(private val context: Context) {
         val LANGUAGE_KEY = stringPreferencesKey("language")         // "en" | "ar"
     }
 
-    val locationMode: Flow<String> = context.dataStore.data
+    override val locationMode: Flow<String> = context.dataStore.data
         .map { it[LOCATION_MODE_KEY] ?: "gps" }
 
-    suspend fun saveLocationMode(mode: String) {
+    override suspend fun saveLocationMode(mode: String) {
         context.dataStore.edit { it[LOCATION_MODE_KEY] = mode }
     }
 
 
-    val selectedLat : Flow<Double> = context.dataStore.data
+    override val selectedLat : Flow<Double> = context.dataStore.data
         .map { it[SELECTED_LAT_KEY] ?: 0.0 }
 
-    val selectedLon : Flow<Double> = context.dataStore.data
+    override val selectedLon : Flow<Double> = context.dataStore.data
         .map { it[SELECTED_LON_KEY] ?: 0.0 }
 
-    suspend fun saveSelectedLocation(lat: Double, lon: Double) {
+    override suspend fun saveSelectedLocation(lat: Double, lon: Double) {
         context.dataStore.edit {
             it[SELECTED_LAT_KEY] = lat
             it[SELECTED_LON_KEY] = lon
@@ -45,18 +45,18 @@ class SettingsDataStore(private val context: Context) {
     }
 
 
-    val units : Flow<String> = context.dataStore.data
+    override val units : Flow<String> = context.dataStore.data
         .map { it[UNITS_KEY] ?: "metric" }
 
-    suspend fun saveUnits(units: String) {
+    override suspend fun saveUnits(units: String) {
         context.dataStore.edit { it[UNITS_KEY] = units }
     }
 
 
-    val language: Flow<String> = context.dataStore.data
+    override val language: Flow<String> = context.dataStore.data
         .map { it[LANGUAGE_KEY] ?: "en" }
 
-    suspend fun saveLanguage(language: String) {
+    override suspend fun saveLanguage(language: String) {
         context.dataStore.edit { it[LANGUAGE_KEY] = language }
     }
 }
