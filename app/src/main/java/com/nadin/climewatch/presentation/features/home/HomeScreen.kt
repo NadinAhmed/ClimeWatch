@@ -2,6 +2,7 @@ package com.nadin.climewatch.presentation.features.home
 
 import android.Manifest
 import android.app.Application
+import android.content.Context
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,8 +38,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.util.Locale
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -54,6 +57,7 @@ import com.nadin.climewatch.presentation.features.home.components.ProprietariesI
 import com.nadin.climewatch.presentation.features.home.components.TodayForecastItem
 import com.nadin.climewatch.presentation.features.home.components.WeeklyForecastItem
 import com.nadin.climewatch.presentation.ui.theme.LabelLightColor
+import com.nadin.climewatch.presentation.utils.Date.getTodayDateString
 import com.nadin.climewatch.presentation.utils.IconsMapper.getWeatherIcon
 import com.nadin.climewatch.presentation.utils.Location
 import com.nadin.climewatch.presentation.utils.Location.enableLocationServices
@@ -136,6 +140,7 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
     HomeContent(weatherState, forecastState, units)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeContent(
     weatherState: ResultState<Weather>,
@@ -161,12 +166,13 @@ fun HomeContent(
                 weather = weatherState.data,
                 forecast = forecastState.data,
                 units = units,
-                modifier = modifier
+                modifier = modifier,
             )
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HomeSuccessContent(
     weather: Weather,
@@ -174,10 +180,10 @@ private fun HomeSuccessContent(
     units: String,
     modifier: Modifier = Modifier
 ) {
-    val primaryTemperature = formatTemperature(weather.temperature, units)
-    val pressureDisplay = formatPressure(weather.pressure)
+    val primaryTemperature = formatTemperature(weather.temperature, units, LocalContext.current)
+    val pressureDisplay = formatPressure(weather.pressure, LocalContext.current)
     val humidityDisplay = formatHumidity(weather.humidity)
-    val windDisplay = formatWindSpeed(weather.windSpeed, units)
+    val windDisplay = formatWindSpeed(weather.windSpeed, units, LocalContext.current)
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -189,7 +195,13 @@ private fun HomeSuccessContent(
         item {
             Text(
                 "${weather.city}, ${weather.country}",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                getTodayDateString(LocalContext.current),
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -206,10 +218,12 @@ private fun HomeSuccessContent(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacers.VerticalSpacer(4.dp)
             Text(
                 weather.description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -264,7 +278,7 @@ private fun HomeSuccessContent(
                     val hourly = forecast.hourly[index]
                     TodayForecastItem(
                         hour = hourly.time,
-                        temperatureLabel = formatTemperature(hourly.temperature, units),
+                        temperatureLabel = formatTemperature(hourly.temperature, units, LocalContext.current),
                         weatherIconRes = getWeatherIcon(hourly.icon)
                     )
                 }
@@ -282,7 +296,7 @@ private fun HomeSuccessContent(
             WeeklyForecastItem(
                 day = daily.day,
                 weatherDescription = daily.description,
-                temperatureLabel = formatTemperature(daily.temperature, units),
+                temperatureLabel = formatTemperature(daily.temperature, units, LocalContext.current),
                 weatherIconRes = getWeatherIcon(daily.icon)
             )
             Spacers.VerticalSpacer(8.dp)
@@ -290,24 +304,24 @@ private fun HomeSuccessContent(
     }
 }
 
-private fun formatTemperature(value: Double, units: String): String {
+private fun formatTemperature(value: Double, units: String, context: Context): String {
     val symbol = when (units) {
-        "imperial" -> "F°"
-        "standard" -> "K"
-        else -> "C°"
+        "imperial" -> context.getString(R.string.f)
+        "standard" -> context.getString(R.string.k)
+        else -> context.getString(R.string.c)
     }
     return "${value.clean()}$symbol"
 }
 
-private fun formatWindSpeed(value: Double, units: String): String {
+private fun formatWindSpeed(value: Double, units: String, context: Context): String {
     val unitLabel = when (units) {
-        "imperial" -> "mph"
-        else -> "m/s"
+        "imperial" -> context.getString(R.string.mph)
+        else -> context.getString(R.string.m_s)
     }
     return "${value.clean()} $unitLabel"
 }
 
-private fun formatPressure(value: Int): String = "$value hPa"
+private fun formatPressure(value: Int, context: Context): String = "$value" + context.getString(R.string.hpa)
 
 private fun formatHumidity(value: Int): String = "$value%"
 

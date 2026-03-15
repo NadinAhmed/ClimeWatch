@@ -1,7 +1,9 @@
 package com.nadin.climewatch.presentation.utils
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.os.ConfigurationCompat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -48,5 +50,11 @@ object Date {
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
+    }
+
+    fun getTodayDateString(context: Context): String {
+        val locale = ConfigurationCompat.getLocales(context.resources.configuration)[0] ?: Locale.getDefault()
+        val formatter = SimpleDateFormat("EEEE, dd MMM yyyy", locale)
+        return formatter.format(Date())
     }
 }

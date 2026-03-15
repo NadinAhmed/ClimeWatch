@@ -80,7 +80,7 @@ fun SettingsScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SettingsSection(title = "Location") {
+                SettingsSection(title = stringResource(R.string.location)) {
                     LocationSettingsCard(
                         selectedMode = state.locationMode,
                         selectedLat = state.selectedLat,
@@ -89,14 +89,14 @@ fun SettingsScreen(
                     )
                 }
 
-                SettingsSection(title = "Units") {
+                SettingsSection(title = stringResource(R.string.units)) {
                     UnitsSettingsCard(
                         selectedUnits = state.units,
                         onUnitsSelected = { viewModel.onUnitsSelected(it) }
                     )
                 }
 
-                SettingsSection(title = "Language") {
+                SettingsSection(title = stringResource(R.string.language)) {
                     LanguageSettingsCard(
                         selectedLanguage = state.language,
                         onLanguageSelected = { viewModel.onLanguageSelected(it) }
