@@ -27,6 +27,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -60,6 +61,7 @@ import com.nadin.climewatch.data.local.SettingsDataStore
 import com.nadin.climewatch.data.model.City
 import com.nadin.climewatch.presentation.ui.theme.AppGradient
 import com.nadin.climewatch.presentation.ui.theme.ButtonLightColor
+import com.nadin.climewatch.presentation.ui.theme.PrimaryColor
 import com.nadin.climewatch.presentation.ui.theme.PrimaryDarkColor
 import com.nadin.climewatch.presentation.ui.theme.SecondaryTextColor
 import com.nadin.climewatch.presentation.utils.components.Spacers
@@ -77,7 +79,7 @@ fun LocationPickerMap(
         factory = MapViewModelFactory(
             repository = WeatherRepository(context, settingsDataStore),
             settingsDataStore = settingsDataStore,
-            mapSource = MapSource.FromFavorites
+            mapSource = mapSource
         )
     )
 
@@ -143,7 +145,7 @@ fun LocationPickerMap(
                 value = searchQuery,
                 onValueChange = { viewModel.onSearchQueryChanged(it) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(stringResource(R.string.search_for_city)) },
+                placeholder = { Text(stringResource(R.string.search_for_city), color = PrimaryColor) },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = "search")
                 },
@@ -156,11 +158,12 @@ fun LocationPickerMap(
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(20.dp),
+                textStyle = LocalTextStyle.current.copy(color = PrimaryColor),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = SecondaryTextColor,
                     unfocusedContainerColor = SecondaryTextColor,
-                    focusedTextColor = PrimaryDarkColor,
-                    unfocusedTextColor = PrimaryDarkColor,
+                    focusedTextColor = PrimaryColor,
+                    unfocusedTextColor = PrimaryColor,
                     focusedBorderColor = ButtonLightColor,
                     unfocusedBorderColor = Color.White.copy(alpha = 0.3f)
                 )

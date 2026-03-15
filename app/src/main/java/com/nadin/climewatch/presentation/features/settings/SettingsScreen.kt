@@ -52,7 +52,7 @@ fun SettingsScreen(
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
-                is SettingsEvent.OpenMapPicker -> onOpenMapPicker
+                is SettingsEvent.OpenMapPicker -> onOpenMapPicker()
                 is SettingsEvent.RestartApp -> activity.restartActivity()
             }
         }

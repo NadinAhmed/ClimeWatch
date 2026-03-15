@@ -88,7 +88,8 @@ fun AddAlertBottomSheet(
                     text = if (startTime != null) stringResource(R.string.from) + formatTime(
                         startTime!!
                     )
-                    else stringResource(R.string.select_start_time)
+                    else stringResource(R.string.select_start_time),
+                    color = PrimaryColor
                 )
             }
 
@@ -101,7 +102,8 @@ fun AddAlertBottomSheet(
                 Spacers.HorizontalSpacer(8.dp)
                 Text(
                     text = if (endTime != null) stringResource(R.string.to) + formatTime(endTime!!)
-                    else stringResource(R.string.select_end_time)
+                    else stringResource(R.string.select_end_time),
+                    color = PrimaryColor
                 )
             }
             Spacers.VerticalSpacer(20.dp)

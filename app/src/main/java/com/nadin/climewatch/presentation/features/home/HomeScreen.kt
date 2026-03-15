@@ -78,6 +78,7 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
 
     val weatherState by viewModel.weatherState.collectAsStateWithLifecycle()
     val forecastState by viewModel.forecastState.collectAsStateWithLifecycle()
+    val locationMode by viewModel.locationModeState.collectAsStateWithLifecycle()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -97,13 +98,15 @@ fun HomeScreen(cityName: String? = null, lat: Double? = null, lon: Double? = nul
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    DisposableEffect(lifecycleOwner) {
+    DisposableEffect(lifecycleOwner, locationMode) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 if (cityName != null) {
                     viewModel.loadWeatherForSpecificLocation(cityName)
                 } else if (lat != null && lon != null) {
                     viewModel.loadWeatherForSpecificLocation(lat, lon)
+                } else if (locationMode == "map") {
+                    viewModel.refreshWeatherBasedOnSettings()
                 } else {
                     if (Location.checkLocationPermission(context)) {
                         if (isLocEnabled(context)) {

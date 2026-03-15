@@ -27,6 +27,12 @@ class HomeViewModel(
     private val repository: WeatherRepository,
     private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
+    private val _locationModeState = MutableStateFlow("gps")
+    val locationModeState = _locationModeState.asStateFlow()
+
+    private var latestMode: String = "gps"
+    private var latestLat: Double = 0.0
+    private var latestLon: Double = 0.0
 
     private val _weatherState = MutableStateFlow<ResultState<Weather>>(ResultState.Loading)
     val weatherState = _weatherState.asStateFlow()
@@ -49,10 +55,25 @@ class HomeViewModel(
             ) { mode, lat, lon ->
                 Triple(mode, lat, lon)
             }.collect { (mode, lat, lon) ->
-                when (mode) {
-                    "gps" -> loadWeatherForCurrentLocation()
-                    "map" -> loadWeatherForSpecificLocation(lat, lon)
-                }
+                latestMode = mode
+                latestLat = lat
+                latestLon = lon
+                _locationModeState.value = mode
+                requestWeatherForMode(mode, lat, lon)
+            }
+        }
+    }
+
+    fun refreshWeatherBasedOnSettings() {
+        requestWeatherForMode(latestMode, latestLat, latestLon)
+    }
+
+    private fun requestWeatherForMode(mode: String, lat: Double, lon: Double) {
+        when (mode) {
+            "gps" -> loadWeatherForCurrentLocation()
+            "map" -> {
+                if (lat == 0.0 && lon == 0.0) return
+                loadWeatherForSpecificLocation(lat, lon)
             }
         }
     }
