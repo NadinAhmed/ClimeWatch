@@ -21,6 +21,7 @@ Clime Watch is an Android weather application that allows users to track severe 
 *   **Asynchronous Programming:** Kotlin Coroutines and Flow
 *   **Networking:** Retrofit and Gson
 *   **Database:** Room
+*   **Local Storage:** DataStore for settings
 *   **Navigation:** Jetpack Navigation Compose
 *   **Location:** Google Play Services
 *   **Maps:** Google Maps Compose
