@@ -4,6 +4,10 @@
 
 Clime Watch is an Android weather application that allows users to track severe weather alerts and forecasts for their current location or other locations they choose.
 
+## Demo
+
+[Project Demo on YouTube](https://youtu.be/Nd2C1XtWyUY)
+
 ## Features
 
 *   **Current Weather:** Get the current weather conditions for any location.
